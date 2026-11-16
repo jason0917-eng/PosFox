@@ -1,0 +1,589 @@
+{
+  "format": "posfoxgen-poster-quality-research-v1",
+  "researched_at": "2026-11-16",
+  "scope": "原始论文与官方源码回查；仅研究，不代表已接入或已跑官方benchmark",
+  "source_policy": "来源主张与本项目设计建议分开。无模型API调用。Exa HTTP429后用网页浏览/官方GitHub回查。",
+  "sources": [
+    {
+      "id": "ad-paper",
+      "title": "AutoDesign：式7/8及附录A.4评分协议",
+      "url": "https://arxiv.org/abs/2608.13560",
+      "kind": "primary_paper",
+      "locator": "Section 5; Appendix A.4 Table 6",
+      "local_path": "data/papers/autodesign-demo/paper.pdf",
+      "sha256": "9e9b8532f29ab9d12756f4dba5cc8d1577feb9b0057ae1ae6f2bcc9f04ce06d8"
+    },
+    {
+      "id": "ad-rubric",
+      "title": "PosterBench固定七维、权重与密度校准常量",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/poster_rubric.py",
+      "kind": "primary_repository",
+      "locator": "DIMENSIONS; REF_CONTENT_COVERAGE; REF_TEXT_COVERAGE_RATIO",
+      "local_path": "vendor/autodesign/autodesign/evaluator/poster_rubric.py",
+      "sha256": "da647c8197578bb65f029ea2a759efe7b3d6f4e09cf7d90595b0d7974ba0ddcb"
+    },
+    {
+      "id": "ad-aggregate",
+      "title": "PosterBench确定性评分、混合平均与分数上限",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/quality_rubric.py",
+      "kind": "primary_repository",
+      "locator": "aggregate_final; _score_density; presentation_viability_cap_policy; poster_scale_legibility_cap_policy",
+      "local_path": "vendor/autodesign/autodesign/evaluator/quality_rubric.py",
+      "sha256": "a0b916a3d76e786dc244a29fad8c9220d975cde550be8ba745137034211cd282"
+    },
+    {
+      "id": "ad-spatial",
+      "title": "内容占用网格、空间区域与边界损伤",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/spatial.py",
+      "kind": "primary_repository",
+      "locator": "content_occupancy; basic_layout_integrity",
+      "local_path": "vendor/autodesign/autodesign/evaluator/spatial.py",
+      "sha256": "c2cc741ff2b6da2f7e869a78a66573146fb6e506011e52528d78d76f33f51dfa"
+    },
+    {
+      "id": "ad-metrics",
+      "title": "图片证据覆盖/拼贴提示及正文截图识别",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/metrics.py",
+      "kind": "primary_repository",
+      "locator": "visual_evidence_metrics; _detect_figure_cramming; paper_body_screenshot_metrics",
+      "local_path": "vendor/autodesign/autodesign/evaluator/metrics.py",
+      "sha256": "489f7b4a82a5eb7e26076c589bca1c4a98666262fe1af37f2b2f0b3681eaf823"
+    },
+    {
+      "id": "ad-ocr",
+      "title": "OCR文字占比的实际定义",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/ocr.py",
+      "kind": "primary_repository",
+      "locator": "run_ocr: sum of text-box area / image area",
+      "local_path": "vendor/autodesign/autodesign/evaluator/ocr.py",
+      "sha256": "e0b9b3d96c8d949a8d12dc5bc1b4698d574b0e7f2b059f93ae23ea29e712e7bd"
+    },
+    {
+      "id": "ad-skill-review",
+      "title": "AutoDesign生成Skill独立语义审稿协议",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/agent_skills/autodesign-poster/references/review-rubric.md",
+      "kind": "primary_repository",
+      "locator": "Artifact-review procedure; Exact repair-route table",
+      "local_path": "vendor/autodesign/agent_skills/autodesign-poster/references/review-rubric.md",
+      "sha256": "ec61c1d3f7e35f9addf4d0e882b253f18bfc35a28bb7167feb9f1675a2155a3c"
+    },
+    {
+      "id": "ad-dom",
+      "title": "AutoDesign可编辑海报DOM审计",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/agent_skills/autodesign-poster/scripts/poster_dom_audit.py",
+      "kind": "primary_repository",
+      "locator": "STABLE_FINDING_CODES; TABLE_MIN_FONT_PX; IMAGE_EFFECTIVE_RESOLUTION_MIN",
+      "local_path": "vendor/autodesign/agent_skills/autodesign-poster/scripts/poster_dom_audit.py",
+      "sha256": "d2637a877141d0e43d585fac47fe2ade05ade7058a0893437848b62a8ee3626b"
+    },
+    {
+      "id": "ad-legacy-prompt",
+      "title": "存在旧近似权重，不能覆盖固定协议",
+      "url": "https://github.com/Yaxin9Luo/AutoDesign/blob/bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e/autodesign/evaluator/vlm_benchmark.py",
+      "kind": "primary_repository",
+      "locator": "POSTER_QUALITY_USER_PROMPT",
+      "local_path": "vendor/autodesign/autodesign/evaluator/vlm_benchmark.py",
+      "sha256": "c4efbe948eacf15811ff088e1e4be7a338b8dfd38060e3271dbc7b7a874f6704"
+    },
+    {
+      "id": "p2p-paper",
+      "title": "Paper2Poster原论文：评价与逐块修复",
+      "url": "https://arxiv.org/html/2505.21497v2",
+      "kind": "primary_paper",
+      "locator": "Sections 3.3, 4.2, 4.3; Appendix F"
+    },
+    {
+      "id": "p2p-layout",
+      "title": "Paper2Poster布局1–5分锚点",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/utils/prompt_templates/aesthetic_layout_judge.yaml",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/utils/prompt_templates/aesthetic_layout_judge.yaml",
+      "sha256": "8738c811d703a68f0928e51217ce96209d05ef66e1041068258f17b5f7a1c923"
+    },
+    {
+      "id": "p2p-element",
+      "title": "Paper2Poster图像/标签/配色一致性1–5分",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/utils/prompt_templates/aesthetic_element_judge.yaml",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/utils/prompt_templates/aesthetic_element_judge.yaml",
+      "sha256": "e54e8aae0efc731f9c8f2653ccb636361fc1841bb432cf9da51f7fd042dbe4b2"
+    },
+    {
+      "id": "p2p-engagement",
+      "title": "Paper2Poster字体、颜色和视觉流1–5分",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/utils/prompt_templates/aesthetic_engagement_judge.yaml",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/utils/prompt_templates/aesthetic_engagement_judge.yaml",
+      "sha256": "3fabbc8d731574a611178d3fd1ef6b531aea8c63ac972e25f8059f66638a99be"
+    },
+    {
+      "id": "p2p-logic",
+      "title": "Paper2Poster跨区块叙事逻辑1–5分",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/utils/prompt_templates/information_logic_judge.yaml",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/utils/prompt_templates/information_logic_judge.yaml",
+      "sha256": "ce4501aeb31b66862236f99405a0ef8a3c16be30ca168f7e6f340f6dd7b69572"
+    },
+    {
+      "id": "p2p-content",
+      "title": "Paper2Poster内容深度1–5分",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/utils/prompt_templates/information_content_judge.yaml",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/utils/prompt_templates/information_content_judge.yaml",
+      "sha256": "3f51e72083901d2c14b88b315c4ae398044c3f1c52b934dd98d96b5253132b8c"
+    },
+    {
+      "id": "p2p-default",
+      "title": "Paper2Poster Skill首稿默认值而非通用阈值",
+      "url": "https://github.com/Paper2Poster/Paper2Poster/blob/70fc6f7b778bc8c9bfecc22875eff66f4eb65f93/skills/references/poster-defaults.md",
+      "kind": "primary_repository",
+      "locator": null,
+      "local_path": "vendor/paper2poster/skills/references/poster-defaults.md",
+      "sha256": "7ff7c4568eaf887ca8f3beeabe244ba93ef14ff0b805ac2f8ec65057ba59282d"
+    },
+    {
+      "id": "pg-paper-v1",
+      "title": "PosterGen版本限定设计/评价准则",
+      "url": "https://arxiv.org/html/2508.17188v1",
+      "kind": "primary_paper",
+      "locator": "Sections 3, 5.1 Table 1; Appendix 8.2; v1 only"
+    },
+    {
+      "id": "pg-plan",
+      "title": "PosterGen真实空间内容规划提示词",
+      "url": "https://github.com/Y-Research-SBU/PosterGen/blob/8a54325f871ee10fa6545de3b3a9b771aa12620c/config/prompts/spatial_content_planner.txt",
+      "kind": "primary_repository",
+      "locator": "key_visual; Core Technical Content; Visual Distribution; rich text"
+    },
+    {
+      "id": "pg-classify",
+      "title": "PosterGen按研究角色分类源图",
+      "url": "https://github.com/Y-Research-SBU/PosterGen/blob/8a54325f871ee10fa6545de3b3a9b771aa12620c/config/prompts/classify_visuals.txt",
+      "kind": "primary_repository",
+      "locator": null
+    },
+    {
+      "id": "cu-guide",
+      "title": "CU Boulder物理系实体海报设计指南",
+      "url": "https://physicslabs.colorado.edu/posters/design-guide/",
+      "kind": "official_university_guide",
+      "locator": "Type sizes for print; Figures that stay sharp; CU colors"
+    },
+    {
+      "id": "usf-guide",
+      "title": "USF图书馆科研海报设计指南",
+      "url": "https://guides.lib.usf.edu/ResearchPosters/design-choices",
+      "kind": "official_university_guide",
+      "locator": "Layout; Color; Font"
+    },
+    {
+      "id": "pg-cvpr2026",
+      "title": "PosterGen CVPR2026最终论文",
+      "url": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Zhang_PosterGen_Aesthetic-Aware_Multi-Modal_Paper-to-Poster_Generation_Via_Multi-Agent_LLMs_CVPRF_2026_paper.pdf",
+      "kind": "primary_paper",
+      "locator": "Section 3; Section 5.1; Table 2, Table 3, Table 4; 11 pages; directly downloaded and PDF text inspected"
+    }
+  ],
+  "posterbench": {
+    "dimensions": [
+      {
+        "id": "source_faithfulness",
+        "label_zh": "忠实性",
+        "weight": 10,
+        "owner": "mixed",
+        "definition_zh": "论文中的主张、数字、对象和图像证据一致，无捏造。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "paper_coverage",
+        "label_zh": "内容覆盖",
+        "weight": 10,
+        "owner": "subjective",
+        "definition_zh": "保存问题、方法、证据、结论的研究主线。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "information_density_and_synthesis",
+        "label_zh": "信息密度与综合",
+        "weight": 15,
+        "owner": "deterministic",
+        "definition_zh": "有意义内容占用、OCR文本、空洞/空带与正文截图。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "visual_evidence_use",
+        "label_zh": "视觉证据",
+        "weight": 10,
+        "owner": "mixed",
+        "definition_zh": "图表与论文有关、可读，附近有解释与结论，非截图墙。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "basic_layout_integrity",
+        "label_zh": "布局完整性",
+        "weight": 20,
+        "owner": "deterministic",
+        "definition_zh": "画布/比例有效，没有越界、裁切、重叠、导出边缘损伤、占位图。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "layout_readability",
+        "label_zh": "阅读性",
+        "weight": 25,
+        "owner": "mixed",
+        "definition_zh": "海报尺度文字、层级、扫描路径、平衡和拥挤程度。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      },
+      {
+        "id": "professional_aesthetics",
+        "label_zh": "专业审美",
+        "weight": 10,
+        "owner": "subjective",
+        "definition_zh": "字体、有限配色和构图一致，具有科研沟通功能。",
+        "source_ids": [
+          "ad-rubric",
+          "ad-paper"
+        ]
+      }
+    ],
+    "aggregation": "q_j in [0,10]; R=sum(weight_j*q_j/10); final=min(R, C_layout,C_viability,C_failure,C_gate). Mixed目前对可用det/VLM分数取等权平均；缺项不可伪报完整基准。",
+    "thresholds": {
+      "pass": 70,
+      "revise": 50,
+      "standard_P0_ceiling": 40
+    },
+    "density": {
+      "content_coverage_ref": 0.8,
+      "text_coverage_ref": 0.4,
+      "content_weight": 0.7,
+      "text_lift_weight": 0.3,
+      "formula": "c=min(1,content/0.8); t=min(1,OCR_text/0.4); base=0.7*c+0.3*max(t,c); score=10*base*(1-0.75*min(1,effective_void/0.1))",
+      "limit": "校准满分参考，非所有poster应80%墨水或40%文字；内容占用不计顶部约14%标题区，图表边界内部也算已占用，故不等于1-视觉留白；有效空洞含strip与相关合并处理。"
+    },
+    "visual_evidence": {
+      "score_owner": "VLM; CV advisory only",
+      "wall_hint": "evidence_group_area_ratio>=0.15 and OCR_text_coverage<=0.15",
+      "collage_hint": ">=3 proximate figures; cluster bbox fill>=0.55; proximity gap<=0.35*median_short_side. Advisory only.",
+      "limit": "不是图表最小占比/禁止3图的统一标准；稀疏线图/表格可能漏检。"
+    }
+  },
+  "version_caveats": [
+    "AutoDesign固定benchmark七维权重10/10/15/10/20/25/10。vlm_benchmark.py旧的近似提示权重5/5/35/10/20/15/10不应拿来重新定义最终协议。",
+    "AutoDesign portable Skill另有7项1–5分，平均>=3.75且零blocker；它是生成阶段审稿合同，与外部PosterBench七维不是同一组。",
+    "AutoDesign portable Skill要求纯白主画布以适配白底论文证据。这是其生成合同，非PosterBench普遍审美规则。POSFOXGEN若允许有来源的背景/配色，需要明确自家合同，不能同时宣称完全照搬纯白门禁。",
+    "PosterGen已分别回查：arXiv v1 Table1有16细维度；CVPR2026最终Table2/3/4为7内容+13审美=20细项，分别报告均分。保留版本标签，不混用。"
+  ],
+  "other_metrics": {
+    "paper2poster": {
+      "scale": "6维1–5分",
+      "aesthetic": [
+        "Element Quality",
+        "Layout Balance",
+        "Engagement"
+      ],
+      "information": [
+        "Clarity",
+        "Content Completeness",
+        "Logical Flow"
+      ],
+      "aggregation": "论文表1显示分组均分与总均分，非PosterBench权重。",
+      "PaperQuiz": "raw score s_r 与文本长度L、人类海报中位长度W结合：s_a=s_r*(1+1/max(1,L/W))；L<=W后不再奖励继续删字。",
+      "limit": "CLIP相似度不是直接美学分，PPL不是事实/逻辑正确率，QA是沟通检验而非仅数字占用。"
+    },
+    "postergen_v1": {
+      "score_scale": "每细项1–5",
+      "content": [
+        "Fidelity",
+        "Conciseness",
+        "Richness",
+        "Synergy",
+        "Narrative",
+        "Balance"
+      ],
+      "design": [
+        "Principles",
+        "Harmony",
+        "Alignment",
+        "Flow",
+        "Hierarchy",
+        "Theme",
+        "Readability",
+        "Accent",
+        "Font",
+        "Consistency"
+      ],
+      "weights": "此处未发现逐项固定权重；不可编造百分比。",
+      "principles": "Alignment, Proximity, Repetition, Contrast; 单色系衍生+少量强调；源图研究角色分类；ABT；4.5:1文字对比。"
+    },
+    "postergen_cvpr2026": {
+      "score_scale": "各细项1–5",
+      "content": [
+        "Layering",
+        "Coverage",
+        "Depth",
+        "Completeness",
+        "ABT",
+        "Flow",
+        "Conciseness"
+      ],
+      "aesthetics": {
+        "Layout": [
+          "Grid",
+          "Whitespace",
+          "Anchor",
+          "Balance"
+        ],
+        "Color": [
+          "Palette",
+          "Hierarchy",
+          "Contrast",
+          "Source"
+        ],
+        "Typography": [
+          "Font",
+          "Emphasis",
+          "Legibility"
+        ],
+        "Strictness": [
+          "Alignment",
+          "Robustness"
+        ]
+      },
+      "weights": "最终Table3/4分别报告7项内容和13项审美及Avg；此处未发现官方跨域固定加权总分，不能与PosterBench七维权重混合。",
+      "importance": "最终版有明确的Depth/Richness近似问题与Robustness/Alignment分项，较v1更细。"
+    }
+  },
+  "operational_checks": [
+    {
+      "id": "content_density",
+      "label_zh": "内容密度/文字占比",
+      "dimensions": [
+        "information_density_and_synthesis",
+        "layout_readability"
+      ],
+      "source_ids": [
+        "ad-spatial",
+        "ad-ocr",
+        "ad-aggregate",
+        "p2p-default"
+      ],
+      "before_generation_prompt_zh": "每个区块有实质信息，避免空心大卡片、超长段落和用缩小字号塞满；按画布、实际字体和源图容量分配文字预算。",
+      "after_reconstruction_check_zh": "输出body内容占用/OCR框面积/最大空洞与逐块字数，结合全图和区块可读性审查；中文不能直接套英文字数。",
+      "ownership_and_limit_zh": "占用与OCR为自动测量；拥挤和信息价值由独立语义/视觉审稿判断。"
+    },
+    {
+      "id": "must_cover",
+      "label_zh": "主逻辑及技术覆盖",
+      "dimensions": [
+        "paper_coverage",
+        "source_faithfulness"
+      ],
+      "source_ids": [
+        "ad-paper",
+        "p2p-content",
+        "p2p-logic",
+        "pg-plan"
+      ],
+      "before_generation_prompt_zh": "每块绑定source-backed must-cover点；明确输入、输出、方法/模型、创新及验证，不可用少量slogan替代技术说明。",
+      "after_reconstruction_check_zh": "逐项核对asset table的来源、是否可见、是否足以回答技术读者的问题；关键指标含任务/数据/基线/量纲/限定条件。",
+      "ownership_and_limit_zh": "语义判断，覆盖清单是否完备也需独立审稿；输入输出等显式字段是本项目适配。"
+    },
+    {
+      "id": "visual_selection",
+      "label_zh": "漂亮且相关的原论文图优先",
+      "dimensions": [
+        "visual_evidence_use",
+        "paper_coverage"
+      ],
+      "source_ids": [
+        "pg-classify",
+        "pg-plan",
+        "p2p-element"
+      ],
+      "before_generation_prompt_zh": "先审全PDF源图，按关键方法/问题/主结果/比较/支持分组；优先清晰、有解释力且美观的图，主方法与关键结果均获足够面积。",
+      "after_reconstruction_check_zh": "一一核对source visual ID，保留完整图像、标签、图例和附近readout；漂亮不能覆盖不相关、信息不足或错误。",
+      "ownership_and_limit_zh": "分类/相关性/选图为语义判断，裁图/尺寸/文件hash可自动。"
+    },
+    {
+      "id": "visual_coverage",
+      "label_zh": "图表覆盖/避免缩略图墙",
+      "dimensions": [
+        "visual_evidence_use",
+        "layout_readability"
+      ],
+      "source_ids": [
+        "ad-metrics",
+        "ad-paper"
+      ],
+      "before_generation_prompt_zh": "少而关键的完整图表，按重要性放大，并在附近写出它证实什么；不以填充图数量为目标。",
+      "after_reconstruction_check_zh": "记录证据组面积/数量/短边、缩略图组、无图和截图墙提示；检测不到图时不可当作确定无图。",
+      "ownership_and_limit_zh": "CV只作建议；VLM对意义/可读性最终判断，无统一必须占50%规则。"
+    },
+    {
+      "id": "collage_background",
+      "label_zh": "背景融合/拼贴感",
+      "dimensions": [
+        "professional_aesthetics",
+        "visual_evidence_use",
+        "layout_readability"
+      ],
+      "source_ids": [
+        "ad-metrics",
+        "ad-skill-review",
+        "p2p-element",
+        "pg-paper-v1",
+        "pg-cvpr2026"
+      ],
+      "before_generation_prompt_zh": "统一面板底色与图表周边留白，图像边缘有目的地对齐；避免无关阴影/底纹、白色截图硬贴在冲突背景上，保证数据原色与可读性。",
+      "after_reconstruction_check_zh": "放大每个图与容器接缝、观察底色突变/粗边/拥挤图群及局部留白；回看全图是否连贯。",
+      "ownership_and_limit_zh": "拼贴CV提示存在；没有发现通用背景融合独立分数。底色差/接缝残差可作为我们未来辅助量，不能冒称已有验证标准。"
+    },
+    {
+      "id": "typography",
+      "label_zh": "字体排版/层级",
+      "dimensions": [
+        "layout_readability",
+        "professional_aesthetics"
+      ],
+      "source_ids": [
+        "p2p-layout",
+        "p2p-engagement",
+        "ad-dom",
+        "cu-guide"
+      ],
+      "before_generation_prompt_zh": "建立少量字体及标题/节标题/正文/图注层级，关键词有限强调，字体随实际物理海报尺寸设定；长内容先精简再调版。",
+      "after_reconstruction_check_zh": "核查computed字体/字号/行距、实际字体加载、native文本可编辑性，截图缩放与打印尺寸下正文/坐标轴/图例可读。",
+      "ownership_and_limit_zh": "DOM和物理单位测量+视觉审稿；CSS px、归一化OCR像素和印刷pt不可直接等同。"
+    },
+    {
+      "id": "alignment",
+      "label_zh": "对齐/间距/阅读路径",
+      "dimensions": [
+        "basic_layout_integrity",
+        "layout_readability"
+      ],
+      "source_ids": [
+        "p2p-layout",
+        "pg-paper-v1",
+        "ad-dom",
+        "pg-cvpr2026"
+      ],
+      "before_generation_prompt_zh": "事先声明网格与阅读路径；相邻区块共享边缘、内边距和标题基线，留白区分组，不能用模版盒子代替科学组织。",
+      "after_reconstruction_check_zh": "DOM查溢出/裁剪/重叠、图表容器/表格/邻块间隙，区块截图查边缘/基线，最后全图查读序。",
+      "ownership_and_limit_zh": "部分DOM自动+全图视觉；若新增对齐偏差阈值应由本项目校准。"
+    },
+    {
+      "id": "color",
+      "label_zh": "配色/对比/一致性",
+      "dimensions": [
+        "professional_aesthetics",
+        "layout_readability"
+      ],
+      "source_ids": [
+        "pg-paper-v1",
+        "p2p-engagement",
+        "cu-guide",
+        "pg-cvpr2026"
+      ],
+      "before_generation_prompt_zh": "从已选图像获得主色与相近过渡色，少量反差色突出关键证据；表头等相同角色一致；正文与背景高对比，颜色不承担唯一语义。",
+      "after_reconstruction_check_zh": "CSS可测纯色文字对比；复杂背景采样结合视觉，检查同类模块一致、图表图例原色、强调色是否滥用。",
+      "ownership_and_limit_zh": "PosterGen采用4.5:1文字对比原则；不是七维新增权重，也不是所有图像像素都必须达到4.5:1。"
+    },
+    {
+      "id": "export_fidelity",
+      "label_zh": "重建与最终输出",
+      "dimensions": [
+        "basic_layout_integrity",
+        "source_faithfulness",
+        "visual_evidence_use"
+      ],
+      "source_ids": [
+        "ad-dom",
+        "ad-skill-review",
+        "p2p-element"
+      ],
+      "before_generation_prompt_zh": "生成图定义布局目标，真实论文图表按source ID占位；重建换入真实证据，文字与表格恢复可编辑结构，防止生成图表被当作证据。",
+      "after_reconstruction_check_zh": "每块核对文本数字/箭头关系/原图、aspect ratio、完整crop、有效分辨率，screen/PDF均渲染全图与块图复审。",
+      "ownership_and_limit_zh": "数值/几何自动与语义并行；两类通过才放行。"
+    }
+  ],
+  "threshold_policy": [
+    "250–500英文字仅Paper2Poster Skill 48×36英寸首稿默认；CU指南约800词总量是另一场景建议，二者并不构成统一阈值。",
+    "USF建议约40%视觉留白；PosterBench80%内容占用采用网格与图表框并排除标题，二者测量对象不同，不可直接相减互判冲突。",
+    "CU47.48×35.61英寸范例建议title72–96pt、正文24–28pt、图注20–24pt，属具体打印尺寸建议。",
+    "AutoDesign DOM表格24px、有效分辨率1.5是其canvas实现常量；归一化OCR正文高度16/18/20px上限也非印刷字号。"
+  ],
+  "proposed_workflow_adaptation": {
+    "status": "研究建议，尚未改代码/Skill",
+    "pre_generation_debate": {
+      "source": "用户新要求+上述coverage/visual_evidence/narrative标准的本项目适配，并非宣称原论文已经使用debate",
+      "roles": [
+        "内容规划者：提出问题→输入→方法/模型→输出→关键结果，并挑选漂亮且相关的源图。",
+        "技术反证者：根据全文逐项追问input/output/model/innovation、基线/指标/限定条件；指出slogan、遗漏和错误逻辑。",
+        "视觉规划者：检查图片缩放、每块容量/读序、哪幅方法图与结果图值得放大；不可通过删核心信息来省空间。",
+        "独立裁决者：逐条对source span/evidence ID裁决，记录未解决问题，内容计划无逻辑blocker后才生成。"
+      ],
+      "artifact": "简短可审计debate记录：争议点、证据ID、裁决、panel改动、未解决blocker；保存结果，不要求暴露私有思维链。"
+    },
+    "stages": [
+      "全文asset table与图表catalog→must-cover及角色分类→内容debate→区块计划/配色来源/生成提示词",
+      "整图生成→全图七维+局部错误定位；逻辑不可轻修则回计划持续迭代，无三轮自动放行",
+      "通过语义与视觉验收后固定best image→HTML逐块重建、换真实源图、恢复真实文本/可编辑表格",
+      "逐块：源证据/逻辑/图文/数字/字体/对齐/接缝→全图：密度、主次、读序、图表覆盖→screen与PDF验收",
+      "原七维评分保留；逻辑/事实错误另设强制阻塞门，不允许高美学均分抵消。"
+    ],
+    "panel_review_fields": [
+      "panel_id",
+      "claim_ids",
+      "source_visual_ids",
+      "must_cover_points",
+      "input",
+      "output",
+      "model_or_method",
+      "innovation",
+      "metrics_with_context",
+      "density_measurements",
+      "visual_measurements",
+      "font_and_alignment_findings",
+      "background_seam_findings",
+      "semantic_blockers",
+      "localized_repair",
+      "reviewed_render_hashes"
+    ],
+    "limitation": "逐块七维检查是评审细化，不可直接把各块分数平均冒称官方整图PosterBench；全图必须重新评分。"
+  },
+  "recommended_main_reference": {
+    "id": "poster-046",
+    "title": "Demonstration-free Autonomous Reinforcement Learning via Implicit and Bidirectional Curriculum",
+    "source_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24319.png",
+    "original_path": "data/poster_references/poster-046/original.png",
+    "preview_path": "data/poster_references/poster-046/preview.png",
+    "sha256": "71ecce36a032ebd76aa9e60df554443fb4947fe17d7ff3cf1613c63061f80e9b",
+    "reason": "已实际查看完整预览：左动机/贡献，中概览/方法/公式/环境，右实验/消融/过程曲线；比slogan式视觉更适合AutoDesign方法和指标并重的内容。",
+    "borrow": "仅面积配比、中心方法/右侧量化证据、局部readout与阅读顺序；不要复制文字、研究内容、logo或全部配色。",
+    "not_target_paper": "不是AutoDesign论文自身海报或Figure2，无自举照搬。"
+  }
+}

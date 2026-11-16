@@ -1,0 +1,51 @@
+[
+  {
+    "name": "paper2poster",
+    "repository": "Paper2Poster/Paper2Poster",
+    "commit": "70fc6f7b778bc8c9bfecc22875eff66f4eb65f93",
+    "path": "vendor/paper2poster",
+    "sparse_paths": [
+      "skills",
+      "PosterAgent",
+      "utils"
+    ]
+  },
+  {
+    "name": "figfox-gen",
+    "repository": "LawrenceRiver/FigFox-Gen-skill",
+    "commit": "83beb417c8cc422cd4fcec13107bf1893337dc55",
+    "path": "vendor/figfox-gen",
+    "sparse_paths": [
+      "scripts",
+      "scientific_figure_workflow",
+      "references",
+      "assets/figurebench-references"
+    ]
+  },
+  {
+    "name": "autodesign",
+    "repository": "Yaxin9Luo/AutoDesign",
+    "commit": "bd635851ef8a2ae257e2bf4c8cd4e984ea3fff1e",
+    "path": "vendor/autodesign",
+    "sparse_paths": [
+      "autodesign/evaluator",
+      "autodesign/skills",
+      "agent_skills",
+      "eval",
+      "scripts"
+    ]
+  },
+  {
+    "name": "figfox",
+    "repository": "LawrenceRiver/FigFox",
+    "commit": "21ffc01271904d6c5610f0f96afd84530968f11e",
+    "path": "vendor/figfox",
+    "sparse_paths": [
+      "src",
+      "configs",
+      "docs",
+      "prompts",
+      "benchmark/figfox-score-v3"
+    ]
+  }
+]

@@ -1,0 +1,702 @@
+[
+  {
+    "title": "Biologically-inspired adaptive learning in the Hopfield-network based self-optimization model",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://openreview.net/pdf?id=WjHYgEfXiV",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/78172.png"
+  },
+  {
+    "title": "The Hessian Screening Rule",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://proceedings.neurips.cc/paper_files/paper/2022/file/65a925049647eab0aa06a9faf1cd470b-Paper-Conference.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/53448.png"
+  },
+  {
+    "title": "Transformers, parallel computation, and logarithmic depth",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.09268",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/34096.png"
+  },
+  {
+    "title": "Neural Tangent Kernels for Axis-Aligned Tree Ensembles",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2109.04983",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/33750.png"
+  },
+  {
+    "title": "CW-ERM: Improving Autonomous Driving Planning with Closed-loop Weighted Empirical Risk Minimization",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2210.02174",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/59779.png"
+  },
+  {
+    "title": "Identifying the Context Shift between Test Benchmarks and Production Data",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2207.01059",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/64387.png"
+  },
+  {
+    "title": "Neural Unbalanced Optimal Transport via Cycle-Consistent Semi-Couplings",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2209.15621",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/60283.png"
+  },
+  {
+    "title": "Inner Classifier-Free Guidance and Its Taylor Expansion for Diffusion Models",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://openreview.net/pdf?id=0QAzIMq32X",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/19617.png"
+  },
+  {
+    "title": "Butterfly Effects of SGD Noise: Error Amplification in Behavior Cloning and Autoregression",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2310.11428",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/19163.png"
+  },
+  {
+    "title": "Collective Certified Robustness against Graph Injection Attacks",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2403.01423",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/34617.png"
+  },
+  {
+    "title": "Flexible Attention-Based Multi-Policy Fusion for Efficient Deep Reinforcement Learning",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2210.03729",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70577.png"
+  },
+  {
+    "title": "G$^2$N$^2$ : Weisfeiler and Lehman go grammatical",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://openreview.net/pdf?id=eZneJ55mRO",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/18217.png"
+  },
+  {
+    "title": "Privacy-Preserving Machine Learning for Collaborative Data Sharing via Auto-encoder Latent Space Embeddings",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2211.05717",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/64720.png"
+  },
+  {
+    "title": "Differentially Private CutMix for Split Learning with Vision Transformer",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2210.15986",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/61269.png"
+  },
+  {
+    "title": "Light Schrödinger Bridge",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2310.01174",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/18467.png"
+  },
+  {
+    "title": "Conditional Matrix Flows for Gaussian Graphical Models",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2306.07255",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/72206.png"
+  },
+  {
+    "title": "A Context-Integrated Transformer-Based Neural Network for Auction Design",
+    "conference": "ICML",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2201.12489",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202022/21be9a4bd4f81549a9d1d241981cec3c.png"
+  },
+  {
+    "title": "DRAGONN: Distributed Randomized Approximate Gradients of Neural Networks",
+    "conference": "ICML",
+    "year": 2022,
+    "paper_url": "https://proceedings.mlr.press/v162/wang22aj/wang22aj.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202022/3a24b25a7b092a252166a1641ae953e7.png"
+  },
+  {
+    "title": "Learning to Reach Goals via Diffusion",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2310.02505",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/35072.png"
+  },
+  {
+    "title": "GeoReasoner: Geo-localization with Reasoning in Street Views using a Large Vision-Language Model",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2406.18572",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/33861.png"
+  },
+  {
+    "title": "Matrix Compression via Randomized Low Rank and Low Precision Factorization",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2310.11028",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70291.png"
+  },
+  {
+    "title": "All in a Row: Compressed Convolution Networks for Graphs",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/sun23k/sun23k.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/25222.png"
+  },
+  {
+    "title": "Inverse Approximation Theory for Nonlinear Recurrent Neural Networks",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2305.19190",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/17424.png"
+  },
+  {
+    "title": "CROP: Certifying Robust Policies for Reinforcement Learning through Functional Smoothing",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2106.09292",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/e0f120eefd76be864f36ffa8d1a1505a_CnmqYPO.png"
+  },
+  {
+    "title": "RNA-Protein Interaction Classification via Sequence Embeddings",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://www.biorxiv.org/content/10.1101/2024.11.08.622607v1.full.pdf",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/22840.png"
+  },
+  {
+    "title": "Neuroformer: Multimodal and Multitask Generative Pretraining for Brain Data",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2311.00136",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/18486.png"
+  },
+  {
+    "title": "DeepJoint: Robust Survival Modelling Under Clinical Presence Shift",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2205.13481",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/60045.png"
+  },
+  {
+    "title": "Fast kinematics modeling for conjunction with lens image modeling",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://ml4physicalsciences.github.io/2022/files/NeurIPS_ML4PS_2022_68.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/57003.png"
+  },
+  {
+    "title": "Diving into Underwater: Segment Anything Model Guided Underwater Salient Instance Segmentation and A Large-scale Dataset",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2406.06039",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/32896.png"
+  },
+  {
+    "title": "MuSc: Zero-Shot Industrial Anomaly Classification and Segmentation with Mutual Scoring of the Unlabeled Images",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2401.16753",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/19269.png"
+  },
+  {
+    "title": "Input-gradient space particle inference for neural network ensembles",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2306.02775",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/17861.png"
+  },
+  {
+    "title": "A Robust Test for the Stationarity Assumption in Sequential Decision Making",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/wang23ai/wang23ai.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/23597.png"
+  },
+  {
+    "title": "InfinityGAN: Towards Infinite-Pixel Image Synthesis",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2104.03963",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/e96ed478dab8595a7dbda4cbcbee168f.png"
+  },
+  {
+    "title": "Parallel Sampling of Diffusion Models",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/0d1986a61e30e5fa408c81216a616e20-Paper-Conference.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/26531.png"
+  },
+  {
+    "title": "Mechanistic Mode Connectivity",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/lubana23a/lubana23a.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24778.png"
+  },
+  {
+    "title": "PatchRot: A Self-Supervised Technique for Training Vision Transformers",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2210.15722",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/61303.png"
+  },
+  {
+    "title": "An Infinite-Width Analysis on the Jacobian-Regularised Training of a Neural Network",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2312.03386",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/34855.png"
+  },
+  {
+    "title": "DARTFormer: Finding The Best Type Of Attention",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2210.00641",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/64592.png"
+  },
+  {
+    "title": "Color Equivariant Convolutional Networks",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2310.19368",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/69974.png"
+  },
+  {
+    "title": "Langevin Autoencoders for Learning Deep Latent Variable Models",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2209.07036",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/53273.png"
+  },
+  {
+    "title": "Bisimulation Makes Analogies in Goal-Conditioned Reinforcement Learning",
+    "conference": "ICML",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2204.13060",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202022/24389bfe4fe2eba8bf9aa9203a44cdad_Ihoi17m.png"
+  },
+  {
+    "title": "DS-1000: A Natural and Reliable Benchmark for Data Science Code Generation",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2211.11501",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/25042.png"
+  },
+  {
+    "title": "VideoComposer: Compositional Video Synthesis with Motion Controllability",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://papers.nips.cc/paper_files/paper/2023/file/180f6184a3458fa19c28c5483bc61877-Paper-Conference.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70806.png"
+  },
+  {
+    "title": "Quantifying Network Similarity using Graph Cumulants",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://www.jmlr.org/papers/volume24/21-082/21-082.pdf",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/20664.png"
+  },
+  {
+    "title": "Self-supervised detection of atmospheric phenomena from remotely sensed synthetic aperture radar imagery",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://ml4physicalsciences.github.io/2022/files/NeurIPS_ML4PS_2022_158.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/56984.png"
+  },
+  {
+    "title": "Demonstration-free Autonomous Reinforcement Learning via Implicit and Bidirectional Curriculum",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/kim23d/kim23d.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24319.png"
+  },
+  {
+    "title": "Neuro-Symbolic Language Modeling with Automaton-augmented Retrieval",
+    "conference": "ICML",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2201.12431",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202022/20c86a628232a67e7bd46f76fba7ce12_zrDhUbL.png"
+  },
+  {
+    "title": "Agnostic Learnability of Halfspaces via Logistic Loss",
+    "conference": "ICML",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2201.13419",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202022/da87cbc1b5b8501acf3b49eec1cc52c3.png"
+  },
+  {
+    "title": "On the Convergence of mSGD and AdaGrad for Stochastic Optimization",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2201.11204",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/83ddfbd1c4f871159c148d7a010e69be.png"
+  },
+  {
+    "title": "Towards Unbiased Gravitational-Wave Parameter Estimation using Score-Based Likelihood Characterization",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://ml4astro.github.io/icml2023/assets/70.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/28182.png"
+  },
+  {
+    "title": "Deconvolving Detector Effects for Distribution Moments",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://ml4physicalsciences.github.io/2022/files/NeurIPS_ML4PS_2022_43.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/56938.png"
+  },
+  {
+    "title": "Conformal Semantic Keypoint Detection with Statistical Guarantees",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2303.12246",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/60350.png"
+  },
+  {
+    "title": "Equivariant Polynomials for Graph Neural Networks",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2302.11556",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24257.png"
+  },
+  {
+    "title": "SiT Dataset: Socially Interactive Pedestrian Trajectory Dataset for Social Navigation Robots",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/4d6a000c216974f59e597bc878cd6325-Paper-Datasets_and_Benchmarks.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/73508.png"
+  },
+  {
+    "title": "Automatic Clipping: Differentially Private Deep Learning Made Easier and Stronger",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2206.07136",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70978.png"
+  },
+  {
+    "title": "Accurate and Scalable Estimation of Epistemic Uncertainty for Graph Neural Networks",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2309.10976",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/18402.png"
+  },
+  {
+    "title": "UniTabE: A Universal Pretraining Protocol for Tabular Foundation  Model in Data Science",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2307.09249",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/19395.png"
+  },
+  {
+    "title": "High-Performance Temporal Reversible Spiking Neural Networks with O(L) Training Memory and O(1) Inference Cost",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2405.16466",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/32927.png"
+  },
+  {
+    "title": "Unveiling Privacy, Memorization, and Input Curvature Links",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.18726",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/35011.png"
+  },
+  {
+    "title": "Inverse Transition Learning for Characterizing Near-Optimal Dynamics in Offline Reinforcement Learning",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2308.05075",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/26729.png"
+  },
+  {
+    "title": "Active Learning with Table Language Models",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://table-representation-learning.github.io/assets/papers/active_learning_with_tabular_l.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/58553.png"
+  },
+  {
+    "title": "UniMax: Fairer and More Effective Language Sampling for Large-Scale Multilingual Pretraining",
+    "conference": "ICLR",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2304.09151",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202023/10763.png"
+  },
+  {
+    "title": "A Theoretical Analysis of the Test Error of Finite-Rank Kernel Ridge Regression",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/0f580c1ace3b857a390575ca42de7938-Paper-Conference.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/70581.png"
+  },
+  {
+    "title": "A View From Somewhere: Human-Centric Face Representations",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2303.17176",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/58901.png"
+  },
+  {
+    "title": "Comparing Optimization Targets for Contrast-Consistent Search",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2311.00488",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/78911.png"
+  },
+  {
+    "title": "Spatial Graph Attention and Curiosity-driven Policy for Antiviral Drug Discovery",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2106.02190",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/ffeed84c7cb1ae7bf4ec4bd78275bb98_v5I0xq2.png"
+  },
+  {
+    "title": "StyleMorph: Disentangled 3D-Aware Image Synthesis with a 3D Morphable StyleGAN",
+    "conference": "ICLR",
+    "year": 2023,
+    "paper_url": "https://openreview.net/pdf?id=Ojpb1y8jflw",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202023/11636.png"
+  },
+  {
+    "title": "Fine-Tuning Language Models with Just Forward Passes",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2305.17333",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/71437.png"
+  },
+  {
+    "title": "VectorMapNet: End-to-end Vectorized HD Map Learning",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/liu23ax/liu23ax.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24688.png"
+  },
+  {
+    "title": "Visual Correspondence Hallucination",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2106.09711",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/d709f38ef758b5066ef31b18039b8ce5.png"
+  },
+  {
+    "title": "Towards Reasoning-Aware Explainable VQA",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2211.05190",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/61548.png"
+  },
+  {
+    "title": "Moccasin: Efficient Tensor Rematerialization for Neural Networks",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2304.14463",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24408.png"
+  },
+  {
+    "title": "How Do Nonlinear Transformers Acquire Generalization-Guaranteed CoT Ability?",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.15607",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/35804.png"
+  },
+  {
+    "title": "Characterizing the Optimal $0-1$ Loss for Multi-class Classification with a Test-time Attacker",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2302.10722",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/26117.png"
+  },
+  {
+    "title": "Deep Demonstration Tracing: Learning Generalizable Imitator Policy for Runtime Imitation from a Single Demonstration",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://openreview.net/pdf?id=DJdVzxemdA",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/34633.png"
+  },
+  {
+    "title": "NeuPL: Neural Population Learning",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2202.07415",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/d3e8fc83b3e886a0dc2aa9845a5215bf.png"
+  },
+  {
+    "title": "TimeSiam: A Pre-Training Framework for Siamese Time-Series Modeling",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.02475",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/32734.png"
+  },
+  {
+    "title": "A Geometric Framework for Understanding Memorization in Generative Models",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2411.00113",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/38902.png"
+  },
+  {
+    "title": "RvS: What is Essential for Offline RL via Supervised Learning?",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2112.10751",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/addfa9b7e234254d26e9c7f2af1005cb_TEyQrt0.png"
+  },
+  {
+    "title": "Near-real-time monitoring of global ocean carbon sink",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2312.01637",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/21540.png"
+  },
+  {
+    "title": "Uni[MASK]: Unified Inference in Sequential Decision Problems",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2211.10869",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/52812.png"
+  },
+  {
+    "title": "Dichotomy in Compositional Reasoning: Scaling and Limitations of LLMs in Composite Task",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2407.15720",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/21206.png"
+  },
+  {
+    "title": "Data-efficient Large Vision Models through Sequential Autoregression",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.04841",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/34328.png"
+  },
+  {
+    "title": "Information Gain Propagation: a New Way to Graph Active Learning with Soft Labels",
+    "conference": "ICLR",
+    "year": 2022,
+    "paper_url": "https://arxiv.org/pdf/2203.01093",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202022/dc82d632c9fcecb0778afbc7924494a6.png"
+  },
+  {
+    "title": "[Re] Graph Edit Networks",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://zenodo.org/records/6574701/files/article.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/56092.png"
+  },
+  {
+    "title": "Revisiting Robustness in Graph Machine Learning",
+    "conference": "ICLR",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2305.00851",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202023/11062.png"
+  },
+  {
+    "title": "PIXIU: A Comprehensive Benchmark, Instruction Dataset and Large Language Model for Finance",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2306.05443",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/73431.png"
+  },
+  {
+    "title": "Subtractive Mixture Models via Squaring: Representation and Learning",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2310.00724",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/17457.png"
+  },
+  {
+    "title": "GeoMFormer: A General Architecture for Geometric Molecular Representation Learning",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2406.16853",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/33785.png"
+  },
+  {
+    "title": "FLAb: Benchmarking deep learning methods for antibody fitness prediction",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://www.biorxiv.org/content/10.1101/2024.01.13.575504v1.full.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/77449.png"
+  },
+  {
+    "title": "Generation Probabilities are Not Enough: Improving Error Highlighting for AI Code Suggestions",
+    "conference": "NeurIPS",
+    "year": 2022,
+    "paper_url": "https://helenavasc.com/static/HCAI_NeurIPS_2022.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202022/58819.png"
+  },
+  {
+    "title": "A Rate-Distortion View of Uncertainty Quantification",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2406.10775",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/32634.png"
+  },
+  {
+    "title": "CABINET: Content Relevance-based Noise Reduction for Table Question Answering",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2402.01155",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/18603.png"
+  },
+  {
+    "title": "Sparse Parameterization for Epitomic Dataset Distillation",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://papers.nips.cc/paper_files/paper/2023/file/9e8889198d16fb79926e71adbe38cae4-Paper-Conference.pdf",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/71245.png"
+  },
+  {
+    "title": "Extending Kernel PCA through Dualization: Sparsity, Robustness and Fast Algorithms",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/tonin23a/tonin23a.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/23776.png"
+  },
+  {
+    "title": "Scaling Spherical CNNs",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/esteves23a/esteves23a.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24521.png"
+  },
+  {
+    "title": "Truly Scale-Equivariant Deep Nets with Fourier Layers",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "paper_url": "https://arxiv.org/pdf/2311.02922",
+    "image_url": "https://neurips.cc/media/PosterPDFs/NeurIPS%202023/71980.png"
+  },
+  {
+    "title": "Improving equilibrium propagation without weight symmetry through Jacobian homeostasis",
+    "conference": "ICLR",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2309.02214",
+    "image_url": "https://iclr.cc/media/PosterPDFs/ICLR%202024/17971.png"
+  },
+  {
+    "title": "Fast, Scalable, Warm-Start Semidefinite Programming with Spectral Bundling and Sketching",
+    "conference": "ICML",
+    "year": 2024,
+    "paper_url": "https://arxiv.org/pdf/2312.11801",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202024/33411.png"
+  },
+  {
+    "title": "Do You Remember? Overcoming Catastrophic Forgetting for Fake Audio Detection",
+    "conference": "ICML",
+    "year": 2023,
+    "paper_url": "https://proceedings.mlr.press/v202/zhang23au/zhang23au.pdf",
+    "image_url": "https://icml.cc/media/PosterPDFs/ICML%202023/24753.png"
+  }
+]

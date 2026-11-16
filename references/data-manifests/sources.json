@@ -1,0 +1,37 @@
+{
+  "format": "posfoxgen-packaged-data-manifests-v1",
+  "artifacts": {
+    "paper2poster-100.json": {
+      "source_url": "https://huggingface.co/datasets/Paper2Poster/Paper2Poster",
+      "source_metadata_path": "data/metadata/paper2poster-100.json",
+      "source_sha256": "352de3996278768fadcf1a371cccdccbbb0a601dd20b21d0a04545c64678e817",
+      "transformation": "Remove qa field only; retain title,conference,year,paper_url,image_url exactly.",
+      "path": "references/data-manifests/paper2poster-100.json",
+      "bytes": 28404,
+      "sha256": "bcfdf0a5ababe76b85eb4244038466441b09a33741183fdf3c4372b044635b01"
+    },
+    "PosterBench.jsonl": {
+      "source_url": "https://huggingface.co/datasets/YaxinLuo/PosterBench/resolve/main/data/test.jsonl",
+      "transformation": "verbatim",
+      "path": "references/data-manifests/PosterBench.jsonl",
+      "bytes": 116325,
+      "sha256": "a0254f79f5d175d5392af0bda059198dfeda2248c0e3ad726d8238f30dbcb08e"
+    },
+    "PosterBench-mini.jsonl": {
+      "source_url": "https://huggingface.co/datasets/YaxinLuo/PosterBench-mini/resolve/main/data/test.jsonl",
+      "transformation": "verbatim",
+      "path": "references/data-manifests/PosterBench-mini.jsonl",
+      "bytes": 15769,
+      "sha256": "cdd25795f73d26bb6d492b4f55ba2c69cf99880191dbc2dac5082c785d649ddf"
+    },
+    "poster-references.json": {
+      "source_url": "https://huggingface.co/datasets/Paper2Poster/Paper2Poster",
+      "transformation": "50 downloaded source-bound records; PosterBench100 title overlaps excluded; pins per-original source URL and SHA256.",
+      "path": "references/data-manifests/poster-references.json",
+      "bytes": 101100,
+      "sha256": "864d1396132672b34d756c2f55e1ba293f5f4472b4a90cdc48cb60a13ae2a055"
+    }
+  },
+  "large_assets_location": "data/poster_references/; original images are not bundled in the skill entry point",
+  "licence_boundary": "Metadata MIT where specified by datasets; author poster images remain reference-inspection-only, not licensed by these metadata."
+}
