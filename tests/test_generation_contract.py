@@ -116,3 +116,30 @@ def test_negative_placeholder_prohibition_is_accepted():
 def test_explicit_placeholder_flag_cannot_hide_behind_full_source_mode():
     a, p, h, r = generation_inputs(); h["image_slots"][0]["placeholder"] = True
     assert "source_not_drawn" in codes(validate_generation_handoff(a, p, h, r))
+
+
+def geometry_inputs():
+    a, p, h, r = generation_inputs()
+    a['assets'][0].update(path='fig1.png', width=1200, height=400, sha256='b'*64, bbox=[0, 0, 300, 100])
+    a['assets'][1].update(path='table1.png', width=600, height=400, sha256='c'*64, bbox=[0, 0, 150, 100])
+    for slot, aid, w, ht, digest in [(h['image_slots'][0], 'fig1', 1200, 400, 'b'*64), (h['image_slots'][1], 'table1', 600, 400, 'c'*64)]:
+        slot['source_geometry'] = [{'asset_id': aid, 'sha256': digest, 'pixel_size': [w, ht], 'aspect_ratio': w/ht}]
+        slot['planned_frame'] = [0, 0, w/2, ht/2]
+        slot['geometry_policy'] = 'preserve_source_aspect'
+    return a, p, h, r
+
+
+def test_strict_generation_requires_measured_source_geometry():
+    a, p, h, r = geometry_inputs(); h['image_slots'][0].pop('source_geometry')
+    assert 'missing_source_geometry' in codes(validate_generation_handoff(a, p, h, r, require_source_geometry=True))
+
+
+def test_strict_generation_rejects_wrong_measurements_and_distorted_frame():
+    a, p, h, r = geometry_inputs()
+    h['image_slots'][0]['source_geometry'][0]['pixel_size'] = [400, 1200]
+    assert 'source_geometry_mismatch' in codes(validate_generation_handoff(a, p, h, r, require_source_geometry=True))
+    a, p, h, r = geometry_inputs(); h['image_slots'][0]['planned_frame'] = [0, 0, 400, 400]
+    # A square envelope is allowed, but must say contain; it cannot silently become a square diagram.
+    assert 'source_frame_distortion' in codes(validate_generation_handoff(a, p, h, r, require_source_geometry=True))
+    h['image_slots'][0]['geometry_policy'] = 'contain'
+    assert validate_generation_handoff(a, p, h, r, require_source_geometry=True)['pass']

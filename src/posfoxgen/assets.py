@@ -38,6 +38,9 @@ def extract_assets(pdf_path, out_dir, crops=None, render_scale=2):
     def add(record):
         if record['id'] in used:raise ValueError('duplicate asset id: '+record['id'])
         used.add(record['id']);record['source']={'page':record['page'],'locator':record['source_locator'],'paper_sha256':source_hash}
+        if record.get('path') and record.get('width') and record.get('height'):
+            x0,y0,x1,y1=record['bbox']
+            record['geometry']={'pdf_size_pt':[x1-x0,y1-y0], 'pixel_size':[record['width'],record['height']], 'aspect_ratio':record['width']/record['height']}
         table['assets'].append(record)
     for page_index,page in enumerate(doc):
         page_num=page_index+1

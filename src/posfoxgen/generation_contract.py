@@ -6,6 +6,7 @@ No word-count or small-print convention is introduced by this module.
 """
 
 import re
+import math
 
 from .logic import read_object
 
@@ -97,7 +98,7 @@ participant blockers may remain as history. No API or scientific grader runs.
     return {"pass": not blockers, "blockers": blockers, "semantic_fidelity_pass": None}
 
 
-def validate_generation_handoff(asset_table, panel_plan, handoff, requirements=None):
+def validate_generation_handoff(asset_table, panel_plan, handoff, requirements=None, *, require_source_geometry=False):
     """Validate a full-paper, full-source-drawing handoff before image generation.
 
 Existing panel_plan.panels[].image_slots {id,asset_id} is supported directly.
@@ -136,6 +137,8 @@ The checker cannot verify that the eventual generated pixels depict those data.
             blockers.append({"code": "placeholder_instruction", "message": "Source slot instruction contradicts full source drawing", "instruction": instruction})
     for key in planned.keys() - supplied_slots.keys():
         blockers.append({"code": "missing_image_slot", "message": f"Planned source image slot {key} is absent"})
+    if require_source_geometry:
+        blockers.extend(validate_source_geometry(asset_table, handoff))
     content = handoff.get("content_plan", [])
     roles = {item.get("role") for item in content if str(item.get("text", "")).strip()}
     for role in sorted(CONTENT_ROLES - roles):
@@ -172,3 +175,41 @@ The checker cannot verify that the eventual generated pixels depict those data.
     debate = validate_content_debate(asset_table, handoff.get("technical_story", {}), handoff.get("debate", {}))
     blockers.extend(debate["blockers"])
     return {"pass": not blockers, "blockers": blockers, "warnings": [], "semantic_fidelity_pass": None}
+
+
+def validate_source_geometry(asset_table, handoff):
+    """Check measured source sizes and planned envelopes; never certify image pixels."""
+    blockers = []
+    assets = {a.get("id"): a for a in asset_table.get("assets", [])}
+    def block(code, message): blockers.append({"code": code, "message": message})
+    for slot in handoff.get("image_slots", []):
+        context = str(slot.get("id"))
+        measured = slot.get("source_geometry")
+        if not isinstance(measured, list) or not measured:
+            block("missing_source_geometry", f"{context} needs measured source geometry")
+            continue
+        expected = {i for i in slot.get("source_ids", []) if assets.get(i, {}).get("path")}
+        if {g.get("asset_id") for g in measured if isinstance(g, dict)} != expected:
+            block("source_geometry_mismatch", f"{context} must measure each assigned visual source")
+        ratios = []
+        for g in measured:
+            if not isinstance(g, dict):
+                block("source_geometry_mismatch", f"{context} geometry must be an object"); continue
+            a = assets.get(g.get("asset_id"), {})
+            width, height = a.get("width"), a.get("height")
+            if not all(isinstance(n, (int, float)) and not isinstance(n, bool) and math.isfinite(n) and n > 0 for n in (width, height)):
+                block("source_geometry_mismatch", f"{context} source has no real pixel dimensions"); continue
+            ratio = width / height; ratios.append(ratio)
+            if g.get("pixel_size") != [width, height] or g.get("sha256") != a.get("sha256") or not isinstance(g.get("aspect_ratio"), (int, float)) or not math.isclose(g["aspect_ratio"], ratio, rel_tol=1e-6):
+                block("source_geometry_mismatch", f"{context} geometry differs from authoritative source")
+        frame = slot.get("planned_frame", [])
+        if not isinstance(frame, list) or len(frame) != 4 or not all(isinstance(n, (int, float)) and not isinstance(n, bool) and math.isfinite(n) for n in frame) or min(frame[2:]) <= 0:
+            block("missing_planned_frame", f"{context} needs a finite planned x,y,width,height frame"); continue
+        policy = slot.get("geometry_policy")
+        if policy == "native_table" and slot.get("native_table_source_checked") is True:
+            continue
+        if policy == "contain":
+            continue
+        if policy != "preserve_source_aspect" or len(ratios) != 1 or not math.isclose(frame[2] / frame[3], ratios[0], rel_tol=.01):
+            block("source_frame_distortion", f"{context} needs a source-aspect frame or explicit contain; native tables require source-checked reflow")
+    return blockers

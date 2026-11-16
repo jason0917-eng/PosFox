@@ -4,6 +4,8 @@ Use this short instruction with the actual generated design, approved paper-back
 
 > Convert this accepted poster design into complete editable HTML code (or SVG when explicitly requested). Return the complete artifact in one response.
 >
+> During this same intake, measure and freeze every visible module/feature in the generated-design roster before native code. Preserve module count, repeated modules, vertical area allocation, background/band colors, text proportions, orange dots/bullets and structural rules. Do not silently delete or simplify any of these.
+>
 > Build in this order: canvas and major region positions; native panel shapes and rules; full source figures and native tables; native text with the observed hierarchy. Reuse the existing rendering vocabulary.
 >
 > Two execution priorities: preserve visual alignment, and keep every text run inside its frame. Use measured font sizes/line heights and adequate frame dimensions; preserve scientific wording and values. Do not solve overflow by silently dropping content.
@@ -12,4 +14,4 @@ Use this short instruction with the actual generated design, approved paper-back
 >
 > No SAM3, fixed 1/2 crops, separate reconstruction-plan report, strategy search, reward scoring or new renderer implementation. Include stable object IDs, source correspondences and concise required manifest/spec data with this response or obtain them by the existing deterministic exporter. Do not write a long explanation.
 
-Save and render the response using existing deterministic tools. Read the actual render once to form the paired-window visual issue map. With no effective issues, finalize it unchanged. Otherwise make one local batch for the frozen issue list, check affected objects/export integrity and finish or explicitly report unresolved material defects. Never initiate another open-ended reconstruction cycle.
+Save and render the response using existing deterministic tools. Read the actual render once against every frozen roster module to form the paired-window visual issue map, retaining clean comparisons and separate red-pen overlays. Treat confirmed module/area/text/color/dot differences as repair issues. Source-aspect fitting is the narrow image-only exception, not a waiver for surrounding layout changes. With no effective issues, finalize it unchanged. Otherwise make one local batch for the frozen issue list, check affected objects/export integrity and finish or explicitly report unresolved material defects. Never initiate another open-ended reconstruction cycle.

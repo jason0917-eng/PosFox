@@ -57,3 +57,11 @@ def test_high_resolution_crop_records_actual_pixels_scale_and_pdf_bounds(tmp_pat
     for scale in (0,-1,True,float('inf')):
         with pytest.raises(ValueError,match='render_scale'):
             module.extract_assets(pdf,tmp_path/'bad',crops=crops,render_scale=scale)
+
+
+def test_crop_geometry_is_ready_for_generation_layout_not_just_dpi(tmp_path):
+    from posfoxgen.assets import extract_assets
+    pdf = tmp_path / 'paper.pdf'; fixture_pdf(pdf)
+    table = extract_assets(pdf, tmp_path / 'out', [{'id': 'wide', 'page': 1, 'bbox': [30, 30, 350, 80]}], render_scale=4)
+    figure = next(a for a in table['assets'] if a['id'] == 'wide')
+    assert figure['geometry'] == {'pdf_size_pt': [320.0, 50.0], 'pixel_size': [1280, 200], 'aspect_ratio': 6.4}

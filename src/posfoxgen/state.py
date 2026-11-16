@@ -11,6 +11,7 @@ from .delivery import validate_package
 from .generation_contract import validate_content_debate, validate_generation_handoff
 from .reconstruction_audit import validate_reconstruction_audit
 from .export_bindings import validate_export_bindings
+from .design_roster import validate_design_roster
 
 STAGES = ("input", "assets", "planned", "logic_approved", "image_reviewed", "reconstructed", "repairing", "finalized")
 
@@ -43,7 +44,7 @@ def init_run(run_dir, paper, split="development", profile="legacy-v1"):
     source = Path(paper).resolve(strict=True)
     if split not in {"development", "train", "training", "heldout", "test", "validation", "independent"}:
         raise ValueError("Unknown dataset split")
-    if profile not in {"legacy-v1", "posfoxgen-v2"}:
+    if profile not in {"legacy-v1", "posfoxgen-v2", "posfoxgen-v3"}:
         raise ValueError("Unknown run profile")
     root.mkdir(parents=True, exist_ok=True)
     if (root / "run.json").exists():
@@ -237,7 +238,7 @@ def _v2_image_blockers(run, records, image_records, review):
         for handoff_key, approved_key in (("technical_story", "technical_story"), ("debate", "content_debate")):
             if canonical_hash(handoff.get(handoff_key)) != canonical_hash(docs[approved_key]):
                 blockers.append({"code": "v2_handoff_plan_mismatch", "message": f"Generation handoff {handoff_key} must equal the approved {approved_key}"})
-        result = validate_generation_handoff(docs["asset_table"], docs["panel_plan"], handoff, handoff.get("requirements"))
+        result = validate_generation_handoff(docs["asset_table"], docs["panel_plan"], handoff, handoff.get("requirements"), require_source_geometry=run.get("profile") == "posfoxgen-v3")
         if not result["pass"]:
             blockers.append({"code": "v2_generation_handoff_invalid", "message": "Generation handoff contract failed", "details": result["blockers"]})
         slots = {slot["id"] for panel in docs["panel_plan"].get("panels", []) for slot in panel.get("image_slots", [])}
@@ -245,6 +246,18 @@ def _v2_image_blockers(run, records, image_records, review):
         independent = isinstance(review, dict) and review.get("independent") is True and review.get("reviewer") not in {docs["logic_plan"].get("planner"), handoff.get("generator")}
         if not isinstance(review, dict) or not (intake or independent) or review.get("all_planned_visuals_drawn") is not True or not slots <= set(review.get("checked_image_slot_ids", [])):
             blockers.append({"code": "v2_image_review_invalid", "message": "Reconstruction intake or independent visual review must inspect every planned slot and declare all planned visuals fully drawn"})
+        if run.get("profile") == "posfoxgen-v3":
+            if "design_roster" not in image_records:
+                blockers.append({"code":"missing_design_roster", "message":"Freeze design_roster at reconstruction intake, before writing native code"})
+            else:
+                roster = read_object(image_records["design_roster"]["path"])
+                blockers.extend(validate_design_roster(roster))
+                if roster.get("generated_image_sha256") != file_hash(image_records["image"]["path"]):
+                    blockers.append({"code":"roster_image_mismatch", "message":"Roster must bind the actually accepted generated image"})
+                from PIL import Image
+                with Image.open(image_records["image"]["path"]) as generated:
+                    if roster.get("canvas") != list(generated.size):
+                        blockers.append({"code":"roster_image_mismatch", "message":"Roster canvas must match actual generated pixels"})
         if _review_blockers(review, allow_local=True):
             blockers.append({"code": "v2_image_review_invalid", "message": "Independent image review must pass without nonlocal or unresolved hard blockers"})
         blockers.extend(_review_hash_blockers(review, records, IMAGE_REVIEW_INPUTS))
@@ -272,9 +285,26 @@ def _v2_final_blockers(run, records, all_records):
         intended = docs["reconstruction_manifest"]
         if intended.get("generated_image_sha256") != file_hash(image_records["image"]["path"]) or intended.get("render_sha256") != file_hash(records["poster_png"]["path"]):
             blockers.append({"code": "v2_fidelity_image_mismatch", "message": "Fidelity manifest must bind the accepted generated image and actual current delivery PNG"})
-        result = validate_reconstruction_audit(panel_plan, intended, docs["poster_spec"], docs["fidelity_review"])
+        strict = run.get("profile") == "posfoxgen-v3"
+        if strict:
+            if "design_roster" not in records or "design_roster" not in image_records:
+                blockers.append({"code":"missing_design_roster", "message":"Package the same design_roster frozen at intake"})
+            else:
+                frozen = read_object(image_records["design_roster"]["path"])
+                delivered = read_object(records["design_roster"]["path"])
+                if canonical_hash(frozen) != canonical_hash(delivered) or canonical_hash(frozen) != canonical_hash(intended.get("design_roster")):
+                    blockers.append({"code":"roster_changed_after_intake", "message":"Native reconstruction cannot redefine the frozen generated-design roster"})
+        result = validate_reconstruction_audit(panel_plan, intended, docs["poster_spec"], docs["fidelity_review"], require_design_roster=strict)
         if not result["pass"]:
             blockers.append({"code": "v2_reconstruction_invalid", "message": "Independent panel and full-poster reconstruction audit failed", "details": result["blockers"]})
+        if strict:
+            package_root = Path(records["manifest"]["path"]).parent
+            package = read_object(records["manifest"]["path"])
+            bound = {(package_root / entry["path"]).resolve() for entry in package.get("files", [])}
+            for check in docs["fidelity_review"].get("roster_checks", []):
+                for key in ("paired_window_path", "redline_path", "window_manifest_path"):
+                    if key not in check or Path(check[key]).resolve() not in bound:
+                        blockers.append({"code":"roster_evidence_not_packaged", "message":f"Each {key} must be hash-bound in the final package"})
         # The assets-stage mapping is authoritative. A final-stage file with
         # the same key cannot redefine the scientific image an ID refers to.
         source_assets = run["receipts"]["assets"]["artifact_hashes"]["asset_table"]["path"]
@@ -314,7 +344,7 @@ def accept_stage(run_dir, stage, artifacts, review=None, reviewer="harness"):
                 raise ValueError(f"Cannot override upstream approved {key}; return to planning and logic review")
         all_records.update(approved_plans)
     all_records.update(records)
-    profile_v2 = run.get("profile", "legacy-v1") == "posfoxgen-v2"
+    profile_v2 = run.get("profile", "legacy-v1") in {"posfoxgen-v2", "posfoxgen-v3"}
     if profile_v2 and stage == "planned":
         blockers = _v2_planning_blockers(run, all_records)
         if blockers:
@@ -341,7 +371,7 @@ def accept_stage(run_dir, stage, artifacts, review=None, reviewer="harness"):
             if profile_v2:
                 blockers.extend(_v2_image_blockers(run, all_records, records, resolved_review))
         else:
-            blockers = _finalization_blockers(records, all_records, resolved_review, V2_FINAL_ARTIFACTS if profile_v2 else ())
+            blockers = _finalization_blockers(records, all_records, resolved_review, (V2_FINAL_ARTIFACTS + (("design_roster",) if run.get("profile") == "posfoxgen-v3" else ())) if profile_v2 else ())
             if profile_v2:
                 blockers.extend(_v2_final_blockers(run, records, all_records))
         if blockers:
@@ -378,8 +408,8 @@ def validate_delivery(run_dir):
         review = None
     if _review_blockers(review):
         blockers.append({"code": "final_review_invalid", "message": "Current final review must explicitly pass without blockers"})
-    profile_v2 = run.get("profile", "legacy-v1") == "posfoxgen-v2"
-    blockers.extend(_finalization_blockers(records, all_records, review, V2_FINAL_ARTIFACTS if profile_v2 else ()))
+    profile_v2 = run.get("profile", "legacy-v1") in {"posfoxgen-v2", "posfoxgen-v3"}
+    blockers.extend(_finalization_blockers(records, all_records, review, (V2_FINAL_ARTIFACTS + (("design_roster",) if run.get("profile") == "posfoxgen-v3" else ())) if profile_v2 else ()))
     if profile_v2:
         blockers.extend(_v2_final_blockers(run, records, all_records))
     return {"pass": not blockers, "status": "pass" if not blockers else "pending", "blockers": blockers, "run_id": run["run_id"], "stage": run["stage"], "scientific_quality_pass": None}

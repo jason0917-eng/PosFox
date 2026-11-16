@@ -182,3 +182,93 @@ def test_declared_per_row_and_column_table_styles_are_compared(field, value):
     e["panels"][0]["objects"][1] = copy.deepcopy(table)
     m["panels"][0]["objects"][1][field] = value
     assert "object_mismatch" in codes(validate_reconstruction_audit(p, m, e))
+
+
+def roster_inputs():
+    p, m, e, r = audit_inputs()
+    p['panels'][0].update(x=0,y=0,width=200,height=200)
+    e.update(width=200,height=200)
+    e['panels'][0].update(x=0,y=0,width=200,height=200)
+    # A visually required orange bullet is recorded before native construction.
+    bullet={'id':'orange-bullet','type':'rect','x':2,'y':2,'width':2,'height':2,'fill':'#ef7c26','align':'left','near_background':'#f5f7f8'}
+    m['panels'][0]['objects'].append(copy.deepcopy(bullet));e['panels'][0]['objects'].append(copy.deepcopy(bullet))
+    roster={'generated_image_sha256':m['generated_image_sha256'],'canvas':[200,200],'modules':[{'id':'method','native_panel_ids':['method'],'region':[0,0,200,200],'area_ratio':1.0,'area_tolerance':0.02,'frame_tolerance':0.02,'background':'#f5f7f8','text_area_ratio':0.3,'text_area_tolerance':0.03,'text_measurement':'Inspected text bounding-box area / module area, same method for each paired view','features':[{'id':'bullet','kind':'bullet','count':1,'color':'#ef7c26','native_object_ids':['orange-bullet']}]}]}
+    m['design_roster']=roster
+    r['checked_object_ids'].append('orange-bullet')
+    r['roster_checks']=[{'module_id':'method','background_observed':'#f5f7f8','text_area_ratio_observed':0.3,'paired_window_path':m['generated_image_path'],'redline_path':m['render_path'],'assessment':'Compared module proportions and native orange bullet against frozen generated design.','feature_checks':[{'feature_id':'bullet','count_observed':1,'color_observed':'#ef7c26'}]}]
+    from posfoxgen.visual_windows import build_windows
+    directory=Path(m['render_path']).parent/'windows'
+    records=build_windows(m['generated_image_path'],m['render_path'],[{'id':'method','generated_region':[0,0,200,200],'native_region':[0,0,200,200],'marks':[{'side':'native','bbox':[0,0,200,200],'kind':'checked','label':'module'}]}],directory)
+    check=r['roster_checks'][0];check.update({k:records[0][k] for k in ('paired_window_path','redline_path')});check.update(window_id='method',window_manifest_path=str(directory/'windows.json'),window_manifest_sha256=hashlib.sha256((directory/'windows.json').read_bytes()).hexdigest())
+    return p,m,e,r
+
+
+def test_frozen_roster_catches_module_dropped_from_both_manifest_and_native():
+    p,m,e,r=roster_inputs()
+    m['panels']=[]; e['panels']=[];p['panels']=[]
+    assert 'roster_module_omitted' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_frozen_roster_catches_bullet_removed_from_both_native_and_manifest():
+    p,m,e,r=roster_inputs()
+    for d in (m,e):d['panels'][0]['objects']=[o for o in d['panels'][0]['objects'] if o['id']!='orange-bullet']
+    assert 'roster_feature_omitted' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_roster_catches_color_and_module_height_drift():
+    p,m,e,r=roster_inputs();e['panels'][0]['height']=100
+    assert 'roster_area_mismatch' in codes(validate_reconstruction_audit(p,m,e,r))
+    p,m,e,r=roster_inputs();e['panels'][0]['objects'][-1]['fill']='#ffffff'
+    assert 'roster_color_mismatch' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_text_coverage_drift_and_unmarked_windows_cannot_pass_roster():
+    p,m,e,r=roster_inputs();r['roster_checks'][0]['text_area_ratio_observed']=0.1
+    assert 'roster_text_area_mismatch' in codes(validate_reconstruction_audit(p,m,e,r))
+    p,m,e,r=roster_inputs();r['roster_checks'][0].pop('redline_path')
+    assert 'roster_window_evidence_required' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_source_aspect_exception_cannot_excuse_missing_bullets():
+    p,m,e,r=roster_inputs();m['design_roster']['modules'][0]['exception']='source_aspect_contain'
+    for d in (m,e):d['panels'][0]['objects'].pop()
+    assert 'roster_feature_omitted' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_complete_frozen_roster_and_bound_visual_evidence_pass():
+    p,m,e,r=roster_inputs()
+    r['input_hashes']={'panel_plan':canonical_hash(p),'manifest':canonical_hash(m),'exported_spec':canonical_hash(e)}
+    assert validate_reconstruction_audit(p,m,e,r,require_design_roster=True)['pass']
+
+
+def test_strict_reconstruction_cannot_omit_intake_roster():
+    p,m,e,r=audit_inputs()
+    assert 'missing_design_roster' in codes(validate_reconstruction_audit(p,m,e,r,require_design_roster=True))
+
+
+def test_repeated_modules_cannot_reuse_one_surviving_native_occurrence():
+    p,m,e,r=roster_inputs()
+    first=m['design_roster']['modules'][0];first.update(region=[0,0,200,100],area_ratio=.5)
+    second=copy.deepcopy(first);second.update(id='duplicate',region=[0,100,200,100]);second['features'][0]['id']='second-bullet'
+    m['design_roster']['modules'].append(second);e['panels'][0]['height']=100
+    assert 'roster_occurrence_reused' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_module_moved_to_wrong_stack_position_is_not_hidden_by_equal_area():
+    p,m,e,r=roster_inputs()
+    m['design_roster']['modules'][0].update(region=[0,0,200,100],area_ratio=.5)
+    e['panels'][0].update(y=100,height=100)
+    assert 'roster_frame_mismatch' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_nonimage_or_changed_paired_evidence_is_rejected(tmp_path):
+    p,m,e,r=roster_inputs();bogus=tmp_path/'text.txt';bogus.write_text('not a paired image')
+    r['roster_checks'][0].update(paired_window_path=str(bogus),redline_path=str(bogus))
+    assert 'roster_window_evidence_required' in codes(validate_reconstruction_audit(p,m,e,r))
+
+
+def test_reviewed_redline_bytes_cannot_change_after_binding():
+    p,m,e,r=roster_inputs();path=Path(r['roster_checks'][0]['redline_path'])
+    from PIL import Image
+    Image.new('RGB',(400,200),'yellow').save(path)
+    assert 'roster_window_evidence_required' in codes(validate_reconstruction_audit(p,m,e,r))

@@ -17,7 +17,7 @@ def test_cli_init_and_pending_status(tmp_path):
     status = invoke("status", "--run", root)
     assert status.returncode == 0, status.stderr
     assert json.loads(status.stdout)["status"] == "pending"
-    assert json.loads(status.stdout)["profile"] == "posfoxgen-v2"
+    assert json.loads(status.stdout)["profile"] == "posfoxgen-v3"
 
 
 def test_cli_can_explicitly_create_legacy_profile(tmp_path):

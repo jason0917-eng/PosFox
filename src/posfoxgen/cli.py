@@ -17,7 +17,7 @@ def main(argv=None):
     init.add_argument("--run", required=True)
     init.add_argument("--paper", required=True)
     init.add_argument("--split", default="development")
-    init.add_argument("--profile", choices=("posfoxgen-v2", "legacy-v1"), default="posfoxgen-v2", help="New runs enforce v2 generation and fidelity gates by default")
+    init.add_argument("--profile", choices=("posfoxgen-v3", "posfoxgen-v2", "legacy-v1"), default="posfoxgen-v3", help="New runs enforce measured source geometry and frozen design-roster fidelity")
     for name in ("status", "validate-delivery"):
         command = commands.add_parser(name)
         command.add_argument("--run", required=True)

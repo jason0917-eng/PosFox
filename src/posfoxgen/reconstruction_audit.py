@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .generation_contract import AUXILIARY_ROLES
 from .logic import canonical_hash, read_object
+from .design_roster import validate_design_roster
 
 
 RENDER_FIELDS = {"emphasis", "align", "allow_distortion", "asset_id", "background", "background_policy", "color", "column_widths", "fill", "fit", "font_family", "font_size", "font_style", "font_weight", "header_fill", "header_rows", "line_height", "linecap", "padding", "position", "radius", "row_heights", "rows", "row_font_weights", "column_aligns", "row_fills", "source_ids", "stroke", "stroke_width", "svg", "text", "x", "y", "width", "height", "x1", "x2", "y1", "y2"}
@@ -19,7 +20,7 @@ def _positive(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
 
 
-def validate_reconstruction_audit(panel_plan, manifest, exported_spec, review=None):
+def validate_reconstruction_audit(panel_plan, manifest, exported_spec, review=None, *, require_design_roster=False):
     """Check intended panel objects and a real exported poster_spec.
 
 manifest.panels[].objects[] uses the existing poster_spec object fields. Every
@@ -140,6 +141,11 @@ becomes approval merely because the machine checks pass.
                 block("object_omitted", f"Native export omits intended object {object_id}")
             elif any(key not in obj or native.get(key) != obj[key] for key in required):
                 block("object_mismatch", f"Native object {object_id} differs from its intended geometry, typography, source or style")
+    if require_design_roster or "design_roster" in manifest:
+        roster = manifest.get("design_roster")
+        blockers.extend(validate_design_roster(roster, exported_spec, review, native_image_sha256=manifest.get("render_sha256")))
+        if isinstance(roster, dict) and roster.get("generated_image_sha256") != manifest.get("generated_image_sha256"):
+            block("roster_image_mismatch", "Frozen roster must describe the accepted generated image")
     machine_pass = not blockers
     if review is None:
         block("independent_visual_review_required", "An independent reviewer must compare every panel and the whole actual poster")
