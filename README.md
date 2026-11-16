@@ -80,3 +80,38 @@ python -m pytest -q
 ```
 
 完整测试需要上述浏览器、常用字体及固定 FigFox 源码。用户论文、海报原件、缓存、运行记录和个人开发笔记不随源码发布。
+
+
+## 示例：AutoDesign 论文 → 可编辑海报
+
+以 [AutoDesign 论文](https://arxiv.org/abs/2608.13560)为例：先从原文提取方法、实验图表和主张依据，围绕研究问题、输入输出、方法与结果安排正文，再生成整张海报图。重建时保留设计结构，把正文、分隔线和结果表格转成原生对象，并用论文原图替换生成图中的近似图表。
+
+| 图生成结果 | 可编辑重建结果 |
+| --- | --- |
+| ![AutoDesign 生成海报](examples/autodesign/generated-poster.png) | ![AutoDesign 可编辑海报，中央流程图保持原始宽高比](examples/autodesign/poster.png) |
+
+中间两张流程图已恢复原始宽高比。正文和表格可逐项修改，论文图作为保留比例的图像对象移动、缩放或替换。
+
+[可编辑 SVG](examples/autodesign/poster.svg) · [HTML 源文件](examples/autodesign/poster.html) · [PDF](examples/autodesign/poster.pdf) · [完整预览](examples/autodesign/poster.png)
+
+这是 PosFox 根据该论文制作的流程演示；图表和研究结果归原论文作者。生成图用于设计引导，最终科学内容以论文原图与核对后的数值为准。
+
+### 流程节奏参考
+
+下面借用 **FigFox 论文另一轮试跑**的记录说明阶段衔接，共 **11 分 51 秒**。它不是上方 AutoDesign 示例的耗时，也不是固定速度承诺。该次 Skill、质量准则和参考已缓存，计时包含实际编排、工具处理与验证。
+
+| 阶段 | 用时 |
+| --- | --- |
+| 素材准备与三角色讨论（并行） | 3:52 |
+| 完整海报图生成 | 2:36 |
+| 可编辑重建与初次渲染 | 2:23 |
+| 视觉对照与一批局部修复 | 1:34 |
+| 导出、校验与打包 | 1:26 |
+
+该轮使用三份并行初始报告、一次图生成和一批局部修复。[计时来源与阶段边界](examples/figfox-timing-reference.json)。
+
+## 流程图
+
+![PosFox：从论文证据到可编辑海报](docs/assets/posfox-workflow.png)
+
+上层完成基于论文证据的海报图生成；下层重建原生对象，做一次视觉检查，按需局部修复并导出。流程图使用 FigFox Gen 生成。

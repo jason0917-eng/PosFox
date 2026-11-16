@@ -1,0 +1,11 @@
+{
+  "source_paper": "https://arxiv.org/abs/2608.13560",
+  "source_run": "autodesign-pilot",
+  "publication_revision": "Restored original aspect ratios in existing image frames.",
+  "changed_objects": [
+    "source-overview",
+    "source-pipeline"
+  ],
+  "layout_pass": true,
+  "timing": "The accompanying 11m51s timeline describes the separate FigFox paper pilot, not this AutoDesign example."
+}
