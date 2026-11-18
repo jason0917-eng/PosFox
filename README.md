@@ -8,7 +8,7 @@
 
 1. 解析完整论文，提取保留图例、坐标轴和出处的图表素材，记录 PDF 点尺寸、真实像素和宽高比，并把尺寸及预期显示框传给图生成阶段。
 2. 内容、科学核查、视觉规划三个角色并行阅读同一份材料；必要时围绕争议做一次简短回调，由主执行者落实修改。
-3. 优先采用用户给出的主参考，生成包含完整正文和图表的海报图。生成阶段参考 [PosFox-Gen](https://github.com/LawrenceRiver/PosFox-Gen-skill)。
+3. 优先采用用户给出的主参考，生成包含完整正文和图表的海报图。生成阶段已包含在主流程中，使用仓库内的[生成规则](skills/posfoxgen/references/prompt-rules.md)。
 4. 重建前冻结真实生成图的视觉清单，保留所有可见模块（包括正文重复的模块）、面积／文字占比、配色和圆点／结构线；按生成图重建可编辑 HTML / SVG，使用论文原图和准确数值替换生成近似；重建与局部修复参考 [FigFox](https://github.com/LawrenceRiver/FigFox)。
 5. 用干净 paired crops 和独立红笔批注逐模块做一次语义窗口对照。模块遗漏、位置／面积／文字占比变化、错误颜色和丢失圆点／线条均进入同一批局部修复，再验证受影响对象与导出文件；全部检查通过且无问题时才直接交付。
 6. 保留来源、实际审阅记录、阶段耗时和校验结果，交付 HTML、SVG、PNG、PDF。
@@ -35,6 +35,8 @@ ln -s "$PWD/skills/posfoxgen" ~/.codex/skills/posfoxgen
 如果同名 Skill 已存在，先检查其位置。随后在新会话中调用 `$posfoxgen`，提供论文 PDF 和可选的设计参考。模型阶段使用 Harness 当前能力，无需额外搭建模型 API 服务或配置本项目专用 API key。
 
 Skill 入口：[SKILL.md](skills/posfoxgen/SKILL.md)。阶段命令与文件契约：[workflow.md](skills/posfoxgen/references/workflow.md)。
+
+只需安装本仓库并调用同一个 `$posfoxgen`，流程会从论文解析、讨论和海报图生成继续到可编辑重建与导出。无需另装生成版 Skill，也无需在中途切换 Skill。若本机已有同名的旧生成版安装，先备份，再将该入口切换到本仓库的 `skills/posfoxgen`；不要覆盖其他本地修改。
 
 ```sh
 python skills/posfoxgen/scripts/run.py --help
