@@ -50,6 +50,18 @@ python skills/posfoxgen/scripts/run.py validate-delivery --run runs/example
 
 新运行默认使用 `posfoxgen-v3`，强制源图尺寸交接和重建前冻结的视觉清单。重复模块不能共用同一原生对象来冒充覆盖；对照窗、红笔图和来源清单须绑定真实文件哈希并随最终包保留。原图按真实宽高比等比放置，仅能解释图片自身的包络变化，不能豁免周围模块、配色、文字占比或圆点的丢失。显式 v1/v2 保留历史兼容，不自动获得新版保真结论。完整合同见 [visual-fidelity.md](skills/posfoxgen/references/visual-fidelity.md)。
 
+## 可选附加包：只生成海报 PNG
+
+完整流程继续使用 `$posfoxgen`。如果只需要科研海报图，可以单独安装同仓库中的 [PosFox Gen](skills/posfox-gen/SKILL.md)：
+
+```sh
+npx skills@latest add jason0917-eng/PosFox --skill posfox-gen
+```
+
+调用 `$posfox-gen` 并明确说明要做科研海报，提供论文 PDF 和可选海报参考。它包含独立的 PDF 素材提取工具，生成 PNG 后结束，不进入 HTML/SVG 重建，也不会覆盖完整流程入口。私有仓库安装需要相应的 GitHub 访问权限。
+
+这个附加包只用于明确的科研/学术海报请求。普通科研论文插图、方法图、架构图仍走论文图生成流程，不因输入了 PDF 或参考图就转为海报。
+
 ## 渲染与可选修复引擎
 
 渲染需要本机 Chrome / Chromium。未自动找到时，用 `POSFOXGEN_CHROMIUM` 指定可执行文件。字体也需要本地安装；工具会检查实际字体与文字溢出。
