@@ -98,3 +98,8 @@ context margin (0%, 15%, 30%), detail zoom and explicit bridge windows. Publish
 sample size, all unresolved cases and latency alongside quality. Select the
 smallest budget whose extra round has no meaningful benefit under a predefined
 quality/latency criterion. Until these runs exist, report the optimum as unknown.
+
+
+## Text-specific G2 execution
+
+For confirmed SVG wrapping, missing emphasis or mathematical layout defects, use the deterministic native text repair tool documented in the repository `references/svg-text-repair.md`. Bind exact object IDs and source evidence to its issue map. Preserve font size and source text, repair only triggered objects, and inspect the actual repaired SVG plus its independent render. Zero geometry blockers do not prove exact source line breaks or scientific correctness. Unsupported or ambiguous formulae remain blockers rather than guessed Unicode substitutions.

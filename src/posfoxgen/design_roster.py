@@ -48,9 +48,13 @@ def validate_design_roster(roster, exported=None, review=None, *, native_image_s
         ratio=region[2]*region[3]/(canvas[0]*canvas[1])
         if not _number(module.get('area_ratio')) or not math.isclose(ratio,module['area_ratio'],abs_tol=1e-6):
             block('invalid_design_roster',f'{mid}: area ratio must match measured region')
-        for key in ('area_tolerance','frame_tolerance','text_area_ratio','text_area_tolerance'):
+        for key in ('area_tolerance','text_area_ratio','text_area_tolerance'):
             if not _number(module.get(key)) or not 0<=module[key]<=1:
                 block('invalid_design_roster',f'{mid}: {key} must be a frozen finite proportion')
+        ft=module.get('frame_tolerance')
+        frame_limits=ft if isinstance(ft,list) else [ft]*4
+        valid_frame_limits=len(frame_limits)==4 and all(_number(v) and 0<=v<=1 for v in frame_limits)
+        if not valid_frame_limits:block('invalid_design_roster',f'{mid}: frame_tolerance needs one finite proportion or four axis proportions')
         if not module.get('text_measurement') or not isinstance(module.get('features'),list) or not module['features']:
             block('invalid_design_roster',f'{mid}: comparable text measurement and visual features required');continue
         ids = module['native_panel_ids']
@@ -70,7 +74,7 @@ def validate_design_roster(roster, exported=None, review=None, *, native_image_s
                 width=max(p['x']+p['width'] for p in selected)-x;height=max(p['y']+p['height'] for p in selected)-y
                 expected_frame=[region[0]/canvas[0],region[1]/canvas[1],region[2]/canvas[0],region[3]/canvas[1]]
                 actual_frame=[x/exported['width'],y/exported['height'],width/exported['width'],height/exported['height']]
-                if _number(module.get('frame_tolerance')) and any(abs(a-b)>module['frame_tolerance'] for a,b in zip(expected_frame,actual_frame)):
+                if valid_frame_limits and any(abs(a-b)>limit for a,b,limit in zip(expected_frame,actual_frame,frame_limits)):
                     block('roster_frame_mismatch',f'{mid}: native module position/order/shape differs from frozen design')
                 actual=width*height/(exported['width']*exported['height'])
                 if _number(module.get('area_tolerance')) and abs(actual-ratio)>module['area_tolerance']:
@@ -84,7 +88,7 @@ def validate_design_roster(roster, exported=None, review=None, *, native_image_s
             if not isinstance(feature,dict):
                 block('invalid_design_roster',f'{mid}: each feature must be an object');continue
             fid=feature.get('id');ids=feature.get('native_object_ids',[]);count=feature.get('count')
-            if not fid or fid in feature_ids or not feature.get('kind') or not isinstance(count,int) or isinstance(count,bool) or count<1 or not isinstance(ids,list) or not all(isinstance(i,str) for i in ids) or len(set(ids))!=count:
+            if not fid or fid in feature_ids or not feature.get('kind') or not isinstance(count,int) or isinstance(count,bool) or count<0 or not isinstance(ids,list) or not all(isinstance(i,str) for i in ids) or len(set(ids))!=count:
                 block('invalid_design_roster',f'{mid}: enumerate each feature occurrence with stable unique native IDs'); continue
             feature_ids.add(fid)
             if used_objects.intersection(ids):

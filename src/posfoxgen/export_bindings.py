@@ -102,7 +102,9 @@ must still exist under their correct panel, with the intended native type and
 real rendered image bytes. Full static panel/SVG signatures also check text,
 table cells, geometry, typography, rules, colors and source-SVG contents against
 a fresh deterministic export. Internal table-cell/background/SVG IDs are not
-treated as separately planned objects. No browser, model or API is invoked.
+treated as separately planned objects. Normal exports need no browser; the explicit
+typography_repair mode replays local browser measurement and MathText before
+comparison. No model or API is invoked.
 """
     spec, assets = read_object(poster_spec), read_object(asset_table)
     if isinstance(asset_table, (str, Path)):
