@@ -108,13 +108,13 @@ def validate_design_roster(roster, exported=None, review=None, *, native_image_s
         if not check.get('assessment'):
             block('roster_window_evidence_required',f'{mid}: actual paired-window assessment required')
         try:
-            _check_window_evidence(check,roster.get('generated_image_sha256'),native_image_sha256)
+            _check_window_evidence(check,roster.get('generated_image_sha256'),native_image_sha256,region,canvas)
         except (KeyError,ValueError,TypeError,AssertionError,OSError,json.JSONDecodeError) as exc:
             block('roster_window_evidence_required',f'{mid}: {exc}')
     return blockers
 
 
-def _check_window_evidence(check,generated_hash,native_hash):
+def _check_window_evidence(check,generated_hash,native_hash,module_region=None,canvas=None):
     def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
     manifest=Path(check['window_manifest_path']).resolve(strict=True)
     if digest(manifest)!=check['window_manifest_sha256']:
@@ -137,6 +137,21 @@ def _check_window_evidence(check,generated_hash,native_hash):
     if paths[0]==paths[1] or hashes[0]==hashes[1] or dimensions[0]!=dimensions[1]:
         raise ValueError('clean pair and redline must be distinct same-sized images')
     a,b=window['generated_region'],window['native_region']
+    if module_region is not None:
+        # Compare in normalized canvas coordinates, allowing different render DPI.
+        for path, bounds in zip(sources, (a, b)):
+            with Image.open(path) as source:
+                sw, sh = source.size
+            if not isinstance(bounds, list) or len(bounds) != 4 or not all(_number(v) for v in bounds):
+                raise ValueError('invalid window bounds')
+            x,y,w,h=bounds
+            mx,my,mw,mh=module_region
+            if min(x,y)<0 or min(w,h)<=0 or x+w>sw or y+h>sh:
+                raise ValueError('window outside source')
+            if (x/sw > mx/canvas[0] or y/sh > my/canvas[1]
+                    or (x+w)/sw < (mx+mw)/canvas[0]
+                    or (y+h)/sh < (my+mh)/canvas[1]):
+                raise ValueError('window must cover the complete frozen module on both sides')
     expected_width=round(a[0]+a[2])-round(a[0])+round(b[0]+b[2])-round(b[0])
     expected_height=max(round(a[1]+a[3])-round(a[1]),round(b[1]+b[3])-round(b[1]))
     if dimensions[0]!=(expected_width,expected_height):

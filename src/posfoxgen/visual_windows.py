@@ -11,6 +11,43 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 
+def plan_windows(roster, *, context=0.15):
+    """Plan full-module context crops; both renders must use the roster canvas.
+
+    Semantic overlap follows module bounds, not a grid. Optional feature regions
+    are absolute canvas coordinates, and receive their own detail windows.
+    Marks remain empty until a reviewer actually inspects the image pair.
+    """
+    width, height = roster['canvas']
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+               and math.isfinite(v) and v > 0 for v in (width, height)):
+        raise ValueError('positive finite canvas required')
+    if not isinstance(context, (int, float)) or isinstance(context, bool) or not math.isfinite(context) or not 0 <= context <= 1:
+        raise ValueError('context must be between zero and one')
+    result = [{'id': 'overview', 'generated_region': [0, 0, width, height],
+               'native_region': [0, 0, width, height], 'marks': []}]
+    def add(region, module_id, feature_id=None):
+        if not isinstance(region, list) or len(region) != 4 or not all(
+            isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in region
+        ):
+            raise ValueError('finite region required')
+        x, y, w, h = region
+        if min(x, y) < 0 or min(w, h) <= 0 or x+w > width or y+h > height:
+            raise ValueError('region outside canvas')
+        left, top = max(0, math.floor(x-w*context)), max(0, math.floor(y-h*context))
+        right, bottom = min(width, math.ceil(x+w+w*context)), min(height, math.ceil(y+h+h*context))
+        bounds = [left, top, right-left, bottom-top]
+        result.append({'id': f'window-{len(result)}', 'module_id': module_id,
+                       'feature_id': feature_id, 'generated_region': bounds,
+                       'native_region': list(bounds), 'marks': []})
+    for module in roster['modules']:
+        add(module['region'], module['id'])
+        for feature in module.get('features', []):
+            if 'region' in feature:
+                add(feature['region'], module['id'], feature['id'])
+    return result
+
+
 def build_windows(generated, native, windows, out_dir):
     generated=Path(generated).resolve();native=Path(native).resolve();out=Path(out_dir).resolve()
     sources={generated,native};out.mkdir(parents=True,exist_ok=True)
