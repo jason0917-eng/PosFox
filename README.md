@@ -66,6 +66,10 @@ npx skills@latest add jason0917-eng/PosFox --skill posfox-gen
 
 渲染需要本机 Chrome / Chromium。未自动找到时，用 `POSFOXGEN_CHROMIUM` 指定可执行文件。字体也需要本地安装；工具会检查实际字体与文字溢出。
 
+确认文字问题后，可使用[原生 SVG 文字修复](references/svg-text-repair.md)：按实际字形测量换行，恢复分档字重、局部斜体和经过来源核实的公式。安装可选依赖 `python -m pip install -e '.[text-repair]'`，另需本地 Chrome 和 `rsvg-convert`。修复可通过 `typography_repair` 配置在导出时重放；HTML 预览使用同一份原生 SVG，导出绑定校验仍会重新生成并比对结果。
+
+工具不会保证一次修好，也不会以缩小字号隐藏越界。两张此前未用于修复测试的海报均留下未解决问题，见[验证结果与限制](references/svg-text-repair-validation.md)。导出绑定通过不等于版面验收通过。
+
 使用 FigFox 原生局部编辑桥接器或运行其集成测试前，下载固定版本源码：
 
 ```sh

@@ -23,7 +23,7 @@ _AUDIT = r'''<script>
   const item={object_id:el.id,type:el.dataset.objectType,panel_id:p?.id||null,x:b.left-rect.left,y:b.top-rect.top,width:b.width,height:b.height,scroll_width:el.scrollWidth,scroll_height:el.scrollHeight};objects.push(item);
   if(b.left<pb.left-1||b.top<pb.top-1||b.right>pb.right+1||b.bottom>pb.bottom+1)blockers.push({code:'outside_panel',object_id:el.id});
   if(b.left<rect.left-1||b.top<rect.top-1||b.right>rect.right+1||b.bottom>rect.bottom+1)blockers.push({code:'outside_poster',object_id:el.id});
-  if(el.dataset.objectType==='text'&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1))blockers.push({code:'text_overflow',object_id:el.id,scroll_width:el.scrollWidth,scroll_height:el.scrollHeight,width:el.clientWidth,height:el.clientHeight});
+  if(el.dataset.objectType==='text'&&el.namespaceURI!=='http://www.w3.org/2000/svg'&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1))blockers.push({code:'text_overflow',object_id:el.id,scroll_width:el.scrollWidth,scroll_height:el.scrollHeight,width:el.clientWidth,height:el.clientHeight});
   const css=getComputedStyle(el);
   if(el.dataset.fontFamily){
    const family=el.dataset.fontFamily,embedded=el.dataset.fontEmbedded==='true',declaredFace=el.dataset.fontDeclared==='true';
@@ -48,7 +48,24 @@ _AUDIT = r'''<script>
    }
   }
  }
- const out=document.createElement('script');out.id='posfoxgen-render-audit';out.type='application/json';out.textContent=JSON.stringify({width:rect.width,height:rect.height,objects,fonts,warnings,blockers});document.body.append(out);
+ const metadata=document.getElementById('posfoxgen-metadata');
+ if(metadata){
+  const spec=JSON.parse(metadata.textContent).spec;
+  for(const panel of spec?.panels||[])for(const obj of panel.objects||[]){
+   if(obj.type!=='text')continue;
+   const node=[...main.querySelectorAll('text')].find(n=>n.id===obj.id);
+   if(node)node.setAttribute('data-frame',JSON.stringify([obj.x||0,obj.y||0,obj.width,obj.height]));
+  }
+ }
+ const svg_text_checks=(__POSFOX_SVG_GEOMETRY__)();
+ for(const c of svg_text_checks)if(c.horizontal||c.vertical)blockers.push({code:'svg_text_overflow',object_id:c.object_id,geometry:c});
+ const formula_checks=[...main.querySelectorAll('g[data-latex]')].map(g=>{
+  const uses=[...g.querySelectorAll('use')];const missing=uses.filter(n=>!n.href?.baseVal?.startsWith('#')||!document.getElementById(n.href.baseVal.slice(1)));
+  const b=g.getBBox();return {object_id:g.id,latex:g.getAttribute('data-latex'),reference_count:uses.length,missing_references:missing.length,visible_width:b.width,visible_height:b.height};
+ });
+ for(const c of formula_checks)if(c.missing_references||!c.visible_width||!c.visible_height)blockers.push({code:'svg_formula_missing_reference',object_id:c.object_id,geometry:c});
+
+ const out=document.createElement('script');out.id='posfoxgen-render-audit';out.type='application/json';out.textContent=JSON.stringify({width:rect.width,height:rect.height,objects,fonts,warnings,blockers,svg_text_checks,formula_checks});document.body.append(out);
 })();
 </script>'''
 
@@ -81,9 +98,11 @@ def render_poster(html_path,out_dir,browser=None):
     if not source.is_file():raise ValueError('poster HTML does not exist')
     # Relative source assets must keep resolving from the original document root.
     base='<base href="'+html.escape(source.parent.as_uri()+'/',quote=True)+'">'
+    from .svg_text_repair import _SVG_GEOMETRY
+    audit_script=_AUDIT.replace('__POSFOX_SVG_GEOMETRY__',_SVG_GEOMETRY)
     original=source.read_text();audit_source=original.replace('<head>','<head>'+base,1)
     if '<head>' not in original:audit_source=base+audit_source
-    audit_source=audit_source.replace('</body>',_AUDIT+'</body>',1) if '</body>' in audit_source else audit_source+_AUDIT
+    audit_source=audit_source.replace('</body>',audit_script+'</body>',1) if '</body>' in audit_source else audit_source+audit_script
     with tempfile.TemporaryDirectory(prefix='posfoxgen-render-') as tmp:
         tmp=Path(tmp);audit_file=tmp/'audit.html';audit_file.write_text(audit_source)
         common=[executable,'--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--allow-file-access-from-files','--hide-scrollbars','--no-pdf-header-footer','--disable-dev-shm-usage','--user-data-dir='+str(tmp/'profile')]
@@ -102,7 +121,7 @@ def render_poster(html_path,out_dir,browser=None):
     from PIL import Image
     actual=Image.open(out/'poster.png').size
     if actual!=(width,height):raise RuntimeError(f'Chromium screenshot dimensions differ: {actual} versus {(width,height)}')
-    report={'format':'posfoxgen-render-report-v1','engine':'chromium','browser_executable':executable,'rendered':True,'source_html':str(source),'png':str(out/'poster.png'),'pdf':str(out/'poster.pdf'),'width':width,'height':height,'objects':audit['objects'],'fonts':audit.get('fonts',[]),'warnings':audit.get('warnings',[]),'blockers':audit['blockers'],'layout_pass':not audit['blockers'],'scientific_quality_pass':None}
+    report={'format':'posfoxgen-render-report-v1','engine':'chromium','browser_executable':executable,'rendered':True,'source_html':str(source),'png':str(out/'poster.png'),'pdf':str(out/'poster.pdf'),'width':width,'height':height,'objects':audit['objects'],'formula_checks':audit.get('formula_checks',[]),'svg_text_checks':audit.get('svg_text_checks',[]),'fonts':audit.get('fonts',[]),'warnings':audit.get('warnings',[]),'blockers':audit['blockers'],'layout_pass':not audit['blockers'],'scientific_quality_pass':None}
     (out/'render_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));return report
 
 
