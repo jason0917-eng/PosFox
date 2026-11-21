@@ -18,6 +18,12 @@ last valid version if a candidate regresses; verify the selected final bytes.
 
 For a figure-source change, keep the frame and neighbouring native objects fixed. Save both asset IDs. Compare the numbered source page, clean crop and actual rendered slot, including its caption and adjacent text. Accept the replacement only when figure identity, edges, labels and legibility are verified. If the replacement loses evidence, restore only the previous complete image and verify the composed output again; retain independent verified edits. If neither image is complete, keep the issue open.
 
+### Confirmed unreadable raster ticks or legend labels
+
+For a verified, complete chart with unreadable small labels at final size, keep its current frame. Use the source figure and a separate reading to confirm each string, sign and order. On an opaque white background, specify one disjoint whitespace-bounded box per affected text label, excluding bars, grid lines, swatches and legend borders. The opt-in tool takes the original chart PNG and a request such as `{"source_sha256":"…","labels":[{"text":"0%","box":[10,20,42,42],"size":16,"align":"center"}]}`; coordinates are source pixels with exclusive right/bottom edges. Labels on the same legend row can specify a shared integer `baseline` in source-image y coordinates.
+
+Run `scripts/run.py figure-labels source.png --labels confirmed.json --font path/to/font.ttf --out display.png` using Python. Register the result under a separate asset ID, retaining the original source hash, PDF location, exact request and font hash. Check the before/after render at poster size, the protected swatches, and pixels outside the allowed areas. Keep the original for ambiguous readings, unsuitable backgrounds, or a failed visual check. Ordinary reconstruction and export do not invoke this operation.
+
 ## Windows and coverage
 
 Start from the generated design, independently of the HTML. Freeze every module

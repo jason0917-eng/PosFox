@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
 FILE_TOOLS = {
+    "figure-labels": ("figure_labels", "Retype confirmed raster labels in their own boxes"),
     "assets": ("assets", "Extract PDF text, page previews and inspected crops"),
     "editable": ("editable", "Build native SVG and HTML; replay approved typography repair"),
     "render": ("render", "Render local HTML to PNG/PDF and inspect geometry"),
