@@ -18,6 +18,10 @@ For each generation handoff image slot, record:
 
 Repeat these actual dimensions/ratios and intended display sizes in the image prompt, including for unattached visuals. Plan frames from the measured ratios before spending space on prose. `contain` permits an envelope with another ratio, while the complete figure inside retains its true aspect. `native_table` plus `native_table_source_checked:true` permits an exact, readable native reflow of table rows/cells; retain its source geometry and all approved data. Neither exception permits distorted scientific content. Actual image pixels must still be inspected on intake.
 
+### Checking a questionable figure source
+
+Use `assets paper.pdf --inspect-figure-page N --out source` via the skill entry. This produces a numbered page preview and clean PNGs for up to eight outer native rectangular clips or embedded image placements. A clip can bound one panel, an entire plot, or unrelated objects. Check identity, diagram edges, axes, legends and captions on the full page and in the clean PNG. A page can have no suitable candidate. For a verified match, use its recorded page, bbox and a distinct ID with the existing `assets --crops` workflow, or append its clean PNG as a source asset with its original hash and page/bbox. Keep the original source asset until the rendered slot and its neighbours have passed visual review. For a page without suitable native bounds, use the existing visually verified crop procedure.
+
 ## Freeze two rosters before native construction
 
 1. The approved content/panel plan lists the scientific modules and visuals generation must include. Missing planned modules cannot be erased from that plan to justify the generated result; use the existing regeneration budget or leave the fault blocked.

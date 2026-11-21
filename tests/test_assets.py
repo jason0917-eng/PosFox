@@ -65,3 +65,53 @@ def test_crop_geometry_is_ready_for_generation_layout_not_just_dpi(tmp_path):
     table = extract_assets(pdf, tmp_path / 'out', [{'id': 'wide', 'page': 1, 'bbox': [30, 30, 350, 80]}], render_scale=4)
     figure = next(a for a in table['assets'] if a['id'] == 'wide')
     assert figure['geometry'] == {'pdf_size_pt': [320.0, 50.0], 'pixel_size': [1280, 200], 'aspect_ratio': 6.4}
+
+@pytest.mark.parametrize("rotation", [0, 90])
+def test_figure_review_keeps_complete_native_region_and_original_bytes(tmp_path, rotation):
+    import hashlib
+    import json
+    from posfoxgen.figure_candidates import inspect_figure_page
+    from PIL import ImageChops
+
+    pdf = tmp_path / "layout.pdf"
+    with fitz.open() as paper, fitz.open() as diagram:
+        page = paper.new_page(width=400, height=500)
+        page.insert_text((40, 40), "Running title")
+        panel = diagram.new_page(width=300, height=100)
+        panel.insert_text((8, 16), "A legitimate chart title")
+        panel.draw_rect(fitz.Rect(3, 22, 297, 97))
+        panel.insert_text((10, 91), "Bottom legend")
+        placed = fitz.Rect(40, 100, 340, 200)
+        page.show_pdf_page(placed, diagram, 0)
+        page.insert_text((40, 224), "Figure 1: external caption")
+        page.set_rotation(rotation)
+        paper.save(pdf)
+    original = pdf.read_bytes()
+    out = inspect_figure_page(pdf, 1, tmp_path, render_scale=2)
+    manifest = json.loads(out.read_text("utf-8"))
+    assert pdf.read_bytes() == original
+    assert manifest["paper_sha256"] == hashlib.sha256(original).hexdigest()
+    assert (out.parent / manifest["preview"]).is_file()
+    assert len(manifest["assets"]) == 1
+    candidate = manifest["assets"][0]
+    with fitz.open(pdf) as doc:
+        placement = placed * doc[0].rotation_matrix
+        assert candidate["bbox"] == pytest.approx(tuple(placement), abs=.05)
+        expected = doc[0].get_pixmap(matrix=fitz.Matrix(2, 2), clip=placement)
+    with Image.open(out.parent / candidate["path"]) as pixels:
+        assert ImageChops.difference(pixels.convert("RGB"), expected.pil_image().convert("RGB")).getbbox() is None
+
+
+def test_text_only_page_does_not_guess_a_crop(tmp_path):
+    from posfoxgen.figure_candidates import inspect_figure_page
+    import json
+    pdf = tmp_path / "text.pdf"
+    with fitz.open() as doc:
+        page = doc.new_page()
+        page.insert_text((40, 60), "Figure 1. A reference in running text.")
+        doc.save(pdf)
+    manifest = inspect_figure_page(pdf, 1, tmp_path)
+    assert json.loads(manifest.read_text("utf-8"))["assets"] == []
+    assert (manifest.parent / "page.png").is_file()
+    with pytest.raises(ValueError, match="outside"):
+        inspect_figure_page(pdf, 2, tmp_path)

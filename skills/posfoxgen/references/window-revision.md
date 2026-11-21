@@ -16,6 +16,8 @@ a repair. Never silently declare success because a loop ended. Keep immutable
 per-round HTML, renders, issue maps, window manifests and timings. Retain the
 last valid version if a candidate regresses; verify the selected final bytes.
 
+For a figure-source change, keep the frame and neighbouring native objects fixed. Save both asset IDs. Compare the numbered source page, clean crop and actual rendered slot, including its caption and adjacent text. Accept the replacement only when figure identity, edges, labels and legibility are verified. If the replacement loses evidence, restore only the previous complete image and verify the composed output again; retain independent verified edits. If neither image is complete, keep the issue open.
+
 ## Windows and coverage
 
 Start from the generated design, independently of the HTML. Freeze every module

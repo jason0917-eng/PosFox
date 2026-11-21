@@ -84,9 +84,15 @@ def extract_assets(pdf_path, out_dir, crops=None, render_scale=2):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('pdf');parser.add_argument('--out',required=True)
-    parser.add_argument('--crops',help='JSON array of inspected page/bbox crops')
+    source=parser.add_mutually_exclusive_group()
+    source.add_argument('--inspect-figure-page',type=int,help='Inspect native candidate bounds on one PDF page, without changing the source asset table')
+    source.add_argument('--crops',help='JSON array of inspected page/bbox crops')
     parser.add_argument('--render-scale',type=float,default=2,help='PDF crop pixels per point (default 2; 4 gives 288 DPI). Per-crop render_scale can override it.')
     args=parser.parse_args(argv)
+    if args.inspect_figure_page is not None:
+        from .figure_candidates import inspect_figure_page
+        print(inspect_figure_page(args.pdf,args.inspect_figure_page,args.out,args.render_scale))
+        return
     crops=json.loads(Path(args.crops).read_text()) if args.crops else None
     table=extract_assets(args.pdf,args.out,crops,render_scale=args.render_scale)
     print(json.dumps({'asset_table':str(Path(args.out)/'asset_table.json'),'pages':len(table['pages']),'assets':len(table['assets'])}))
