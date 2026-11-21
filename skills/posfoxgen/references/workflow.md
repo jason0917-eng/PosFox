@@ -55,7 +55,7 @@ Run `python -m posfoxgen.fonts` to inspect available families. `font_policy.requ
 - `panel_plan.json`: `panels:[{id,title,purpose,claim_ids,asset_ids,reading_order,image_slots}]`. Reading order is unique. Every planned claim appears in a panel.
 - `logic_review.json`: distinct `reviewer`, `independent:true`, `decision:'pass'|'blocked'`, all `checked_claim_ids` and `checked_relation_ids`, `findings`, and `evidence_notes:[{claim_id,source_locator,assessment}]`. Required `input_hashes` are the canonical JSON hashes returned by `validate_logic`; a missing or stale binding blocks approval. Independence requires a separate review pass that reads the evidence, not renaming the planner.
 - `image_review.json`: `reviewer,decision,findings,blockers,input_hashes`. Bind exact file SHA-256 values for `image`, `logic_plan`, and `panel_plan`. Unresolved global semantic findings use `repairable:false`; local replacement/typographic findings may use `repairable:true`, with exact next actions. Protected sources do not become true because a generated diagram looks plausible.
-- `poster_spec.json`: `title,width,height,background,panels:[{id,x,y,width,height,title,background?,objects:[]}]`. Coordinates are pixels; object coordinates are local to the panel. Text: `{id,type:'text',x,y,width,height,text,font_size,font_weight?,color?,font_family?,line_height?,source_ids:[]}`. Image: `{id,type:'image',x,y,width,height,asset_id,fit:'contain'}`. Tables use native `rows`, `column_widths`, `row_heights`, font, fill/header_fill, stroke and source IDs; line/rect objects preserve structural rules. See module docstrings/tests for exact optional fields. SVG geometry: `{id,type:'svg',x,y,width,height,svg,source_ids:[]}`. Text can declare `emphasis:[{text:"54.99",font_weight:700}]` for exact inline bold matches; HTML spans and SVG tspans preserve one editable paragraph and share real regular/bold width measurement. Every object ID is unique; source assets must hash-match. Use `export_svg` from `posfoxgen.editable` for native SVG.
+- `poster_spec.json`: `title,width,height,background,panels:[{id,x,y,width,height,title,background?,objects:[]}]`. Coordinates are pixels; object coordinates are local to the panel. Text: `{id,type:'text',x,y,width,height,text,font_size,font_weight?,color?,font_family?,line_height?,source_ids:[]}`. Image: `{id,type:'image',x,y,width,height,asset_id,fit:'contain'}`. Tables use native `rows`, `column_widths`, `row_heights`, font, fill/header_fill, stroke and source IDs; line/rect objects preserve structural rules. See module docstrings/tests for exact optional fields. SVG geometry: `{id,type:'svg',x,y,width,height,svg,source_ids:[]}`. Text can declare `emphasis:[{text:"54.99",font_weight:700,color:"#e98a05"}]` for exact inline bold matches; HTML spans and SVG tspans preserve one editable paragraph and share real regular/bold width measurement. Every object ID is unique; source assets must hash-match. Use `export_svg` from `posfoxgen.editable` for native SVG.
 - `quality_review.json`: named `reviewer`, inspected `evidence`, explicit `blockers`, and exactly seven `dimensions` each with `score` (0–100) and evidence-backed `reason`: faithfulness, coverage, density, visual_evidence, layout, readability, aesthetics. Aggregate via `posfoxgen.quality.assess`. Weights 10/10/15/10/20/25/10; protocol is local Harness assessment, not official PosterBench.
 - `repair` records: issues, concrete plan/strategy, actual execution trajectory, before/after score, validity, applicability. `posfoxgen.memory` handles storage, retrieval, expected rewards and seeded exploration. `posfoxgen.figfox_bridge.apply_native_plan` executes real FigFox G1/G2 scoped transactions on native SVG without a model service.
 
@@ -118,3 +118,29 @@ Then follow the bounded G1/G2 protocol in [window-revision.md](window-revision.m
 Read [visual-fidelity.md](visual-fidelity.md) for the current contract and exact fields. New CLI runs require measured `source_geometry`, `planned_frame` and `geometry_policy` per generation slot. At `image_reviewed`, also bind `design_roster=design_roster.json`, frozen from actual generated pixels during reconstruction intake. At finalization include the same `design_roster` in the manifest-bound package and embed it unchanged in `reconstruction_manifest.design_roster`; the state machine checks against the intake receipt. Final fidelity review adds per-module `roster_checks` with real clean/redline paired-window evidence, text proportion and counted/color-checked feature observations. Legacy v1/v2 receipts are not upgraded by relabeling.
 
 The bounded revision budget in [window-revision.md](window-revision.md) applies. Missing modules, repeated module deletion and omitted small features are material faults. Source-aspect exceptions apply only to the contained image, never surrounding design losses.
+
+## Current generated-image-to-delivery path
+
+After generation, read and freeze the actual design roster including exact text
+lines, borders, colors, module counts and relationships. Reconstruct a fresh
+native spec using `export_svg`; do not reuse a failed repair as the design target.
+G1 is a real generated/native paired-window inspection plus actual glyph metrics.
+Freeze only confirmed issues with exact object IDs and source-image SHA bindings.
+Apply general source-confirmed native-object corrections before typography in the
+same local G2 batch. Store highlights as native rect objects in the approved spec,
+not as an unrecorded edit to the final SVG.
+
+New `typography_repair` contracts use `mode: "reference-guided"`; restore reference
+hard lines, keep `et al.` together, adjust tracking/leading only, and audit fixed
+containers and adjacent title/author/citation/DOI text. Preserve healthy objects.
+Run `editable` (now native SVG plus same-tree HTML), then `render`. Inspect SVG and
+HTML pixels, source colors/frames and formula references, and run strict export
+binding replay on the exact final spec. Package the actual PNG/PDF outputs and
+reviews; unresolved blockers remain blocked. Local layout/binding success is not
+an official benchmark score or a substitute for the formal finalized gate.
+
+Historical `editable --html-only` emits an HTML draft only. Python `repair_svg`
+and old stored export contracts retain legacy defaults for compatibility; new
+CLI repair calls default to reference-guided mode. Historical batch replays must
+explicitly select legacy mode when they do not carry reference evidence. Install
+`.[text-repair]`, local Chrome and `rsvg-convert` for the current repair path.

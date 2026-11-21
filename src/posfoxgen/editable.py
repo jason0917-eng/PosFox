@@ -1,4 +1,4 @@
-"""Build a source-backed editable HTML poster from a Harness-authored spec."""
+"""Build source-backed native SVG and HTML from a Harness-authored spec."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -57,24 +57,25 @@ def _text_style(obj):
 
 
 def _emphasis_runs(obj):
-    """Return exact text segments; emphasis adds style, never scientific text."""
+    """Return (text, weight, marker); marker is false, true, or a source hex color."""
     text=obj.get('text','');requests=obj.get('emphasis',[])
     if not isinstance(requests,list):raise ValueError('emphasis must be a list of exact-text requests')
     intervals=[]
     for item in requests:
-        if not isinstance(item,dict) or set(item)!={'text','font_weight'} or not isinstance(item.get('text'),str) or not item['text'] or type(item.get('font_weight')) is not int or item.get('font_weight') not in {500,600,700,800,900}:raise ValueError('emphasis supports exact text and font_weight 500–900')
+        if not isinstance(item,dict) or not {'text','font_weight'}<=set(item) or set(item)-{'text','font_weight','color'} or not isinstance(item.get('text'),str) or not item['text'] or type(item.get('font_weight')) is not int or item.get('font_weight') not in {500,600,700,800,900}:raise ValueError('emphasis supports exact text and font_weight 500–900')
+        marker=_colour(item['color']) if 'color' in item else True
         phrase=item['text'];start=0;found=False
         while True:
             index=text.find(phrase,start)
             if index<0:break
-            found=True;intervals.append((index,index+len(phrase),item['font_weight']));start=index+len(phrase)
+            found=True;intervals.append((index,index+len(phrase),item['font_weight'],marker));start=index+len(phrase)
         if not found:raise ValueError('emphasis text does not match the paragraph')
     intervals.sort()
     if any(intervals[i][0]<intervals[i-1][1] for i in range(1,len(intervals))):raise ValueError('emphasis requests overlap')
     runs=[];offset=0;normal=obj.get('font_weight',400)
-    for start,end,weight in intervals:
+    for start,end,weight,marker in intervals:
         if start>offset:runs.append((text[offset:start],normal,False))
-        runs.append((text[start:end],weight,True));offset=end
+        runs.append((text[start:end],weight,marker));offset=end
     if offset<len(text) or not runs:runs.append((text[offset:],normal,False))
     return runs
 
@@ -131,7 +132,7 @@ def _table_layout(obj):
 
 
 def _shape(obj):
-    stroke=_paint(obj.get('stroke','#17232b'));sw=_number(obj.get('stroke_width',1))
+    stroke=_paint(obj.get('stroke','none' if obj['type']=='rect' else '#17232b'));sw=_number(obj.get('stroke_width',1))
     if obj['type']=='rect':
         return 'rect',{'x':0,'y':0,'width':obj['width'],'height':obj['height'],'rx':_number(obj.get('radius',0)),'fill':_paint(obj.get('fill')),'stroke':stroke,'stroke-width':sw}
     coords={k:_number(obj.get(k,d)) for k,d in [('x1',0),('y1',0),('x2',obj['width']),('y2',obj['height'])]}
@@ -222,7 +223,7 @@ def build_poster(spec, asset_table, out_dir):
                 font_attributes=font_contract(obj)
                 if obj.get('background'):style+='background:'+_colour(obj['background'])+';'
                 text_runs=_emphasis_runs(obj)
-                content=''.join(f'<span data-emphasis="{weight}" style="font-weight:{weight}">{escape(value)}</span>' if marked else escape(value) for value,weight,marked in text_runs)
+                content=''.join(f'<span data-emphasis="{weight}" style="font-weight:{weight}{";color:"+marked if isinstance(marked,str) else ""}">{escape(value)}</span>' if marked else escape(value) for value,weight,marked in text_runs)
                 html.append(f'<div {common} {font_attributes} contenteditable="true" spellcheck="false" style="{escape(style,quote=True)}">{content}</div>')
             elif kind=='image':
                 aid=obj.get('asset_id');asset=assets.get(aid)
@@ -315,9 +316,11 @@ def export_svg(spec, asset_table, out_dir):
             elif len(line)==1:
                 value,weight,marked=line[0];child.text=value
                 if marked:child.set('font-weight',str(weight))
+                if isinstance(marked,str):child.set('fill',marked)
             else:
                 for value,weight,marked in line:
                     part=el('tspan',child,{'font-weight':weight});part.text=value
+                    if isinstance(marked,str):part.set('fill',marked)
         return node
     for panel in spec.get('panels',[]):
         group=el('g',root,{'id':panel['id'],'transform':f'translate({panel.get("x",0)} {panel.get("y",0)})','data-panel-id':panel['id']})
@@ -366,21 +369,28 @@ def export_svg(spec, asset_table, out_dir):
         from .svg_text_repair import repair_svg
         import tempfile
         with tempfile.TemporaryDirectory(prefix='posfox-text-replay-') as temporary:
-            report=repair_svg(output,spec,temporary,issues=repair['issues'])
+            report=repair_svg(output,spec,temporary,issues=repair['issues'],mode=repair.get('mode','legacy'))
             svg_payload=Path(report['svg']).read_text();output.write_text(svg_payload)
             shutil.copyfile(Path(temporary)/'poster.png',Path(out_dir)/'poster.png')
             report.update(svg=str(output.resolve()),source_svg='deterministic base export of this poster_spec')
             (Path(out_dir)/'text-repair-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
         # HTML and SVG now use one actual native tree, including typeset formulae.
         metadata=json.dumps({'format':'posfoxgen-editable-v1','spec':spec},ensure_ascii=False).replace('<','\\u003c')
-        document=f'''<!doctype html><html><head><meta charset="utf-8"><title>{escape(spec.get('title','Poster'))}</title><style>html,body{{margin:0;padding:0}}#poster{{width:{width}px;height:{height}px}}#poster>svg{{display:block}}</style></head><body><main id="poster">{svg_payload}</main><script id="posfoxgen-metadata" type="application/json">{metadata}</script></body></html>'''
+        document=f'''<!doctype html><html><head><meta charset="utf-8"><title>{escape(spec.get('title','Poster'))}</title><style>html,body{{margin:0;padding:0}}#poster{{width:{width}px;height:{height}px}}#poster>svg{{display:block}}@page{{size:{width}px {height}px;margin:0}}</style></head><body><main id="poster">{svg_payload}</main><script id="posfoxgen-metadata" type="application/json">{metadata}</script></body></html>'''
         (Path(out_dir)/'poster.html').write_text(document)
     return output
 
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('spec');parser.add_argument('--assets',required=True);parser.add_argument('--out',required=True)
-    args=parser.parse_args(argv);print(build_poster(args.spec,args.assets,args.out))
+    parser.add_argument('--html-only',action='store_true',help='Historical HTML draft only; does not execute SVG typography repair')
+    args=parser.parse_args(argv)
+    if args.html_only:
+        print(build_poster(args.spec,args.assets,args.out));return
+    spec=json.loads(Path(args.spec).read_text())
+    if isinstance(spec.get('typography_repair'),dict):
+        spec['typography_repair'].setdefault('mode','reference-guided')
+    print(export_svg(spec,args.assets,args.out))
 
 
 if __name__=='__main__':main()

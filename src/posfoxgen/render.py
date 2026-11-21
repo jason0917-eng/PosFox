@@ -21,8 +21,9 @@ _AUDIT = r'''<script>
  for(const el of main.querySelectorAll('[data-object-type]')){
   const b=el.getBoundingClientRect(),p=el.closest('[data-panel-id]'),pb=p?p.getBoundingClientRect():rect;
   const item={object_id:el.id,type:el.dataset.objectType,panel_id:p?.id||null,x:b.left-rect.left,y:b.top-rect.top,width:b.width,height:b.height,scroll_width:el.scrollWidth,scroll_height:el.scrollHeight};objects.push(item);
-  if(b.left<pb.left-1||b.top<pb.top-1||b.right>pb.right+1||b.bottom>pb.bottom+1)blockers.push({code:'outside_panel',object_id:el.id});
-  if(b.left<rect.left-1||b.top<rect.top-1||b.right>rect.right+1||b.bottom>rect.bottom+1)blockers.push({code:'outside_poster',object_id:el.id});
+  const nativeText=el.namespaceURI==='http://www.w3.org/2000/svg'&&el.tagName.toLowerCase()==='text';
+  if(!nativeText&&(b.left<pb.left-1||b.top<pb.top-1||b.right>pb.right+1||b.bottom>pb.bottom+1))blockers.push({code:'outside_panel',object_id:el.id});
+  if(!nativeText&&(b.left<rect.left-1||b.top<rect.top-1||b.right>rect.right+1||b.bottom>rect.bottom+1))blockers.push({code:'outside_poster',object_id:el.id});
   if(el.dataset.objectType==='text'&&el.namespaceURI!=='http://www.w3.org/2000/svg'&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1))blockers.push({code:'text_overflow',object_id:el.id,scroll_width:el.scrollWidth,scroll_height:el.scrollHeight,width:el.clientWidth,height:el.clientHeight});
   const css=getComputedStyle(el);
   if(el.dataset.fontFamily){
@@ -59,6 +60,27 @@ _AUDIT = r'''<script>
  }
  const svg_text_checks=(__POSFOX_SVG_GEOMETRY__)();
  for(const c of svg_text_checks)if(c.horizontal||c.vertical)blockers.push({code:'svg_text_overflow',object_id:c.object_id,geometry:c});
+ const contract=metadata?JSON.parse(metadata.textContent).spec:null;
+ if(contract?.typography_repair?.mode==='reference-guided'){
+  const origins=new Map();for(const p of contract.panels)for(const o of p.objects||[])origins.set(o.id,[p.x||0,p.y||0]);
+  const absolute=c=>{const [x,y]=origins.get(c.object_id)||[0,0];return {...c,x:c.x+x,y:c.y+y};};
+  const all=svg_text_checks.map(absolute);
+  for(const [id,issue] of Object.entries(contract.typography_repair.issues)){
+   const c=all.find(x=>x.object_id===id);if(!c)continue;
+   for(const n of all){
+    if(n.object_id===id)continue;
+    if(Math.min(c.x+c.width,n.x+n.width)-Math.max(c.x,n.x)>1 && Math.min(c.y+c.height,n.y+n.height)-Math.max(c.y,n.y)>1)
+     blockers.push({code:'reference_text_collision',object_id:id,neighbour_id:n.object_id,overlap_y:Math.min(c.y+c.height,n.y+n.height)-Math.max(c.y,n.y)});
+   }
+   const local=svg_text_checks.find(x=>x.object_id===id);let frame=issue.panel_frame;
+   if(issue.container){
+    const box=[...main.querySelectorAll('rect')].find(x=>x.id===issue.container.id);
+    if(box && !box.hasAttribute('transform'))frame=['x','y','width','height'].map(k=>parseFloat(box.getAttribute(k)||0));else frame=null;
+   }
+   if(!frame || local.x<frame[0]-1 || local.y<frame[1]-2 || local.x+local.width>frame[0]+frame[2]+1 || local.y+local.height>frame[1]+frame[3]+2)
+    blockers.push({code:'reference_container_overflow',object_id:id});
+  }
+ }
  const formula_checks=[...main.querySelectorAll('g[data-latex]')].map(g=>{
   const uses=[...g.querySelectorAll('use')];const missing=uses.filter(n=>!n.href?.baseVal?.startsWith('#')||!document.getElementById(n.href.baseVal.slice(1)));
   const b=g.getBBox();return {object_id:g.id,latex:g.getAttribute('data-latex'),reference_count:uses.length,missing_references:missing.length,visible_width:b.width,visible_height:b.height};

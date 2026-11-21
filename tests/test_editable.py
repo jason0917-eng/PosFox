@@ -304,3 +304,29 @@ def test_image_distortion_limit_cannot_be_bypassed_by_permission(tmp_path,width,
     obj.update(width=width,height=height,fit='fill',allow_distortion=True,distortion_reason='Explicit approval cannot override the limit')
     with pytest.raises(ValueError,match='distortion'):
         m.build_poster(spec,table,tmp_path/'blocked')
+
+
+def test_filled_rect_does_not_invent_an_outline_but_explicit_frames_survive(tmp_path):
+    import xml.etree.ElementTree as ET
+    from posfoxgen.editable import export_svg
+    assets,spec=data(tmp_path)
+    spec['panels'][0]['objects']=[
+      {'id':'fill-only','type':'rect','x':5,'y':5,'width':200,'height':50,'fill':'#f5e5e8'},
+      {'id':'source-frame','type':'rect','x':5,'y':65,'width':200,'height':50,'fill':'#ffffff','stroke':'#567baa','stroke_width':.7},
+      {'id':'connection','type':'line','x':5,'y':125,'width':200,'height':1}]
+    target=export_svg(spec,assets,tmp_path/'out')
+    nodes={n.get('id'):n for n in ET.parse(target).iter() if n.get('id')}
+    assert nodes['fill-only'].get('stroke')=='none'
+    assert nodes['source-frame'].get('stroke')=='#567baa'
+    assert nodes['connection'].get('stroke')=='#17232b'
+    assert 'stroke="none"' in (tmp_path/'out/poster.html').read_text()
+
+
+def test_source_bound_emphasis_color_survives_native_and_html_export(tmp_path):
+    import xml.etree.ElementTree as ET
+    from posfoxgen.editable import export_svg
+    assets,spec=data(tmp_path);obj=spec['panels'][0]['objects'][0]
+    obj['emphasis']=[{'text':'24 samples','font_weight':700,'color':'#e98a05'}]
+    target=export_svg(spec,assets,tmp_path/'out')
+    assert any(n.get('fill')=='#e98a05' and '24 samples' in ''.join(n.itertext()) for n in ET.parse(target).iter())
+    assert 'color:#e98a05' in (tmp_path/'out/poster.html').read_text()

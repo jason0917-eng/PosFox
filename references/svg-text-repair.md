@@ -9,7 +9,8 @@ pip install -e '.[text-repair]'
 # Use an already installed Chrome; no browser download is required.
 # Install librsvg/rsvg-convert for independent SVG-to-PNG verification.
 PYTHONPATH=src python -m posfoxgen.svg_text_repair path/to/poster.svg \
-  --spec path/to/poster_spec.json --issues confirmed-text-issues.json --out repaired
+  --spec path/to/poster_spec.json --issues confirmed-text-issues.json \
+  --mode reference-guided --out repaired
 ```
 
 The spec supplies the native object IDs, text, font sizes, text frames and panel
@@ -17,6 +18,11 @@ offsets missing from ordinary SVG text. Text-frame geometry must describe the
 actual SVG; this is not a generic repair tool for arbitrary unindexed SVG files.
 
 ## Issue contract
+
+The compact example below shows the historical issue payload only. For new CLI
+runs, each target must also include the `reason`, image `reference` and enclosing
+`panel_frame` / `container` fields described under reference-guided repair. Use
+`--mode legacy` only when intentionally replaying an old issue map.
 
 The issue map is keyed by exact object ID. Only supply observations grounded in
 paired source/generated and native image windows. Retain the evidence path and
@@ -82,3 +88,57 @@ A spec may opt in with `typography_repair: {format: "posfoxgen-svg-text-repair-v
 Repeated repair removes prior formula groups for each affected owner before inserting replacements. Retyping an existing formula without its original math_runs is rejected rather than losing its semantic source. `style_runs: [{text: "exact phrase", font_style: "italic"}]` supports partial italic styling without changing the rest of a paragraph; overlapping style/formula requests must remain disjoint.
 
 Formula references use SVG2 `href` instead of an arbitrary XML namespace prefix: the latter can work in an XML SVG viewer but fail when inlined into HTML. HTML rendering now reports SVG glyph-frame checks separately from HTML scroll metrics, and checks each formula use reference and its visible geometry. Final acceptance still requires inspecting actual screenshots: reference checks alone do not prove exact source fidelity.
+
+## Reference-guided repair for new G2 runs
+
+Use `typography_repair.mode: "reference-guided"` on new exports. This opt-in
+contract preserves historical replay while replacing automatic whole-poster
+reflow with a confirmed-target chain:
+
+1. G1 compares the original generated image with clean native semantic windows.
+   Freeze only confirmed target IDs, exact `lines`, a `reason`, and
+   `reference: {path, sha256}` bound to the actually inspected image. The hash
+   proves which input was used; it does not prove the transcription is correct.
+2. Restore exact lines with `white-space: pre`; an original line cannot wrap a
+   second time. A split `et al.` (or caller-specified `protected_phrases`) is a
+   severe layout finding. Incorrectly split reference lines are rejected too.
+3. Keep font size, text frames, rectangles and all other objects fixed. Measure
+   overflow and space to the following text; reduce only tracking/leading on
+   explicit targets. Tracking is bounded at -0.12 em, leading at 0.85 em, with
+   at most six measured adjustments. These are safety limits, not proof of
+   readability; unresolved overflow/collision stays blocked for visual review.
+4. Supply `container: {id}` for a native rectangle in the same coordinate parent,
+   or `panel_frame: [x,y,width,height]` for the actual enclosing panel. The tool
+   checks enclosure and intersections with neighbouring text after adaptation.
+   It never grows a container or moves a neighbour. Unknown containment stays
+   blocked. These checks cover text and declared containers, not arbitrary
+   image/shape occlusion; inspect paired visual windows as well.
+5. Review actual SVG and inline HTML, then check that untargeted native objects
+   remain unchanged. Export replay validation does not replace this check.
+
+`spacing_adjustments`, `reference_line_findings`, `container_checks`, and
+`container_blockers` retain the estimated pixels, decisions and residuals.
+`lines` are now hard breaks in both modes. Legacy mode still supports historical
+auto-detection and Unicode normalization; it is not the new reference-only G2.
+
+### Borders and source colors
+
+Rectangles without an explicit `stroke` now export with `stroke="none"` in both
+HTML and SVG. Lines retain their default visible stroke. Reconstructors must
+record whether the generated reference actually has a border and supply its
+color/width explicitly; a filled region is not evidence of an outline.
+`emphasis` supports an optional hexadecimal `color` for a source-confirmed
+phrase, preserving that color through native export and measured repair.
+Do not treat geometry-only G1 as complete visual review: missing source color
+can be a real issue even when every text frame passes.
+
+### Standard repository command
+
+`python skills/posfoxgen/scripts/run.py editable final_spec.json --assets asset_table.json --out editable`
+now invokes `export_svg`, producing native `poster.svg` and `poster.html`. When a
+repair contract omits `mode`, this CLI uses `reference-guided` without overwriting
+the input spec. Explicit historical `mode: "legacy"` is respected. The Python
+API preserves historical defaults for deterministic old-contract replay.
+`editable --html-only` is an explicit HTML-draft compatibility path and does not
+execute this SVG repair pipeline. Follow with `render` and strict export binding
+validation, and retain G1 / source evidence with the final package.

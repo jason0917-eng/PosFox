@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-21",
+  "case": "approved gravitational-wave final spec; source inputs retained locally",
+  "entry": "python skills/posfoxgen/scripts/run.py editable FINAL_SPEC --assets ASSETS --out EDITABLE; render EDITABLE/poster.html --out RENDERED",
+  "byte_identical_to_delivered": {
+    "poster.svg": true,
+    "poster.html": true,
+    "poster.png": true
+  },
+  "layout_pass": true,
+  "strict_export_binding_pass": true,
+  "pdf_pages": 1,
+  "tests_passed": 282,
+  "scope": "Replays the approved G1/G2 spec through standard repository commands. Does not claim the commands automatically perform Harness visual G1 or scientific review.",
+  "formal_finalized_receipt": false
+}

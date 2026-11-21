@@ -62,7 +62,7 @@ def _content(obj,issue,formulae):
     for e in issue.get('emphasis',obj.get('emphasis',[])):
         weight=e['font_weight']
         if type(weight) is not int or weight not in {400,500,600,700,800,900}:raise ValueError('invalid emphasis weight')
-        for m in re.finditer(re.escape(e['text']),text):spans.append((m.start(),m.end(),'weight',weight))
+        for m in re.finditer(re.escape(e['text']),text):spans.append((m.start(),m.end(),'weight',(weight,e.get('color'))))
         if e['text'] not in text:raise ValueError('emphasis text absent: '+e['text'])
     for e in issue.get('style_runs',[]):
         if not e.get('text') or e['text'] not in text:raise ValueError('style-run text absent')
@@ -78,7 +78,11 @@ def _content(obj,issue,formulae):
     for a,b,kind,val in spans:
         if a<end:raise ValueError('overlapping emphasis/formula ranges; split into disjoint runs')
         html.append(_scripts(text[end:a]))
-        if kind=='weight':html.append(f'<span style="font-weight:{val}" data-weight="{val}">'+_scripts(text[a:b])+'</span>')
+        if kind=='weight':
+            weight,color=val
+            if color is not None and not re.fullmatch(r'#[a-fA-F0-9]{3}(?:[a-fA-F0-9]{3})?',color):raise ValueError('invalid emphasis color')
+            paint=';color:'+color if color else ''
+            html.append(f'<span style="font-weight:{weight}{paint}" data-weight="{weight}">'+_scripts(text[a:b])+'</span>')
         elif kind=='style':html.append(f'<span style="font-style:{val}">'+_scripts(text[a:b])+'</span>')
         else:
             root,w,h,depth,latex=formulae[val];markup=ET.tostring(root,encoding='unicode');markup=markup.replace('svg:','').replace('ns0:','')
@@ -106,10 +110,10 @@ _MEASURE=r'''() => {
      const range=document.createRange();range.setStart(node,i);range.setEnd(node,i+step);
      const b=range.getBoundingClientRect(),value=node.data.slice(i,i+step);i+=step;
      if(value==='\n'||!b.width)continue;
-     const y=b.y+ascent;const key=JSON.stringify([Math.round(y*100)/100,css.fontWeight,css.fontStyle,css.fontSize,css.fontFamily,css.color]);
+     const y=b.y+ascent;const key=JSON.stringify([Math.round(y*100)/100,css.fontWeight,css.fontStyle,css.fontSize,css.fontFamily,css.color,css.letterSpacing]);
      const last=runs[runs.length-1];
      if(last && !last.math && last.key===key && Math.abs(last.right-b.x)<0.5){last.text+=value;last.right=b.right;}
-     else runs.push({text:value,x:b.x,y,right:b.right,key,weight:css.fontWeight,style:css.fontStyle,size:parseFloat(css.fontSize),family:css.fontFamily,color:css.color});
+     else runs.push({text:value,x:b.x,y,right:b.right,key,weight:css.fontWeight,style:css.fontStyle,size:parseFloat(css.fontSize),family:css.fontFamily,color:css.color,spacing:css.letterSpacing});
     }return;
    }
    for(const child of node.childNodes)walk(child);
@@ -127,6 +131,7 @@ _SVG_GEOMETRY = r"""() => [...document.querySelectorAll('text[data-frame]')].map
         if(e.tagName.toLowerCase()==='text'){
           const leaves=[...e.querySelectorAll('tspan')].filter(t=>!t.children.length&&t.textContent.trim());const spans=leaves.length?leaves:(e.textContent.trim()?[e]:[]);
           return spans.flatMap(t=>{const css=getComputedStyle(t);ctx.font=`${css.fontStyle} ${css.fontWeight} ${css.fontSize} ${css.fontFamily}`;
+            ctx.letterSpacing=css.letterSpacing==='normal'?'0px':css.letterSpacing;
             const a=ctx.measureText(t.textContent),p=t.getStartPositionOfChar(0),m=inv.multiply(t.getCTM());
             return [[p.x-a.actualBoundingBoxLeft,p.y-a.actualBoundingBoxAscent],[p.x+a.actualBoundingBoxRight,p.y+a.actualBoundingBoxDescent]].map(([x,y])=>new DOMPoint(x,y).matrixTransform(m));});
         }
@@ -136,7 +141,7 @@ _SVG_GEOMETRY = r"""() => [...document.querySelectorAll('text[data-frame]')].map
       return {object_id:n.id,x:left,y:top,width:right-left,height:bottom-top,frame:[x,y,w,h],horizontal:left<x-1||right>x+w+1,vertical:top<y-2||bottom>y+h+2};})"""
 
 
-def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
+def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None,mode="legacy"):
     """Patch only native text nodes; retain all other original SVG elements.
 
     A returned report may contain blockers: execution is not visual acceptance.
@@ -146,12 +151,21 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             browser=p.chromium.launch(executable_path=find_browser(),headless=True)
-            try:return repair_svg(svg_path,spec,out_dir,issues=issues,page=browser.new_page())
+            try:return repair_svg(svg_path,spec,out_dir,issues=issues,page=browser.new_page(),mode=mode)
             finally:browser.close()
     if isinstance(spec,(str,Path)):spec=json.loads(Path(spec).read_text())
-    issues=issues or {};source=Path(svg_path).resolve();out=Path(out_dir).resolve();out.mkdir(parents=True,exist_ok=True)
+    issues=issues or {}
+    if mode not in {'legacy','reference-guided'}:raise ValueError('unknown repair mode')
+    if mode=='reference-guided':
+        from .reference_layout import validate_reference
+        validate_reference(issues)
+    source=Path(svg_path).resolve();out=Path(out_dir).resolve();out.mkdir(parents=True,exist_ok=True)
     if (out/'poster.svg')==source:raise ValueError('output must not overwrite input SVG')
     root=ET.parse(source).getroot();nodes={n.get('id'):n for n in root.iter() if n.get('id')};formulae={};html=[];positions={}
+    reference_line_findings=[]
+    if mode=='reference-guided':
+        from .reference_layout import inspect_reference_lines
+        reference_line_findings=inspect_reference_lines(root,issues)
     for panel in spec['panels']:
         for obj in panel['objects']:
             if obj.get('type')!='text':continue
@@ -163,7 +177,8 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
             positions[oid]=(panel.get('x',0),panel.get('y',0),obj)
             content=_content(obj,issues.get(oid,{}),formulae)
             family=escape(obj.get('font_family','Arial, sans-serif'),quote=True)
-            style=f"position:absolute;left:{x}px;top:{y}px;width:{obj['width']}px;height:{obj['height']}px;font-family:{family};font-size:{obj.get('font_size',24)}px;font-weight:{obj.get('font_weight',400)};font-style:{obj.get('font_style','normal')};line-height:{obj.get('line_height',1.25)};text-align:{obj.get('align','left')};color:{obj.get('color','#17232b')};white-space:pre-wrap;overflow-wrap:normal"
+            whitespace='pre' if 'lines' in issues.get(oid,{}) else 'pre-wrap'
+            style=f"position:absolute;left:{x}px;top:{y}px;width:{obj['width']}px;height:{obj['height']}px;font-family:{family};font-size:{obj.get('font_size',24)}px;font-weight:{obj.get('font_weight',400)};font-style:{obj.get('font_style','normal')};line-height:{obj.get('line_height',1.25)};text-align:{obj.get('align','left')};color:{obj.get('color','#17232b')};white-space:{whitespace};overflow-wrap:normal"
             html.append(f'<div class="repair-text" id="{escape(oid)}" style="{style}"><span data-strut="true">&#8203;</span>{content}</div>')
     # Only trusted local poster-spec text is used; no original HTML scripts execute.
     page.set_viewport_size({'width':int(spec['width']),'height':int(spec['height'])})
@@ -173,9 +188,16 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
     before=page.evaluate(_SVG_GEOMETRY)
     triggered={c['object_id'] for c in before if c['horizontal'] or c['vertical']}|set(issues)
     triggered|={oid for oid,(_,_,obj) in positions.items() if any(c in SUB or c in SUP for c in obj.get('text',''))}
+    if mode=='reference-guided':triggered=set(issues)
     page.goto('about:blank')
     page.set_content('<html><head><style>html,body{margin:0;padding:0}sub,sup{font-size:70%;line-height:0}svg{width:100%;height:100%}</style></head><body>'+''.join(html)+'</body></html>')
-    page.evaluate('document.fonts.ready');measured=page.evaluate(_MEASURE);reports=[]
+    page.evaluate('document.fonts.ready')
+    spacing_adjustments=[]
+    if mode=='reference-guided':
+        from .reference_layout import COMPACT
+        obstacles=[{'id':oid,'x':px+o.get('x',0),'y':py+o.get('y',0),'width':o['width'],'height':o['height']} for oid,(px,py,o) in positions.items()]
+        spacing_adjustments=page.evaluate(COMPACT.replace('__MEASURE__',_MEASURE),{'targets':sorted(triggered),'obstacles':obstacles})
+    measured=page.evaluate(_MEASURE);reports=[]
     for item in measured:
         oid=item['id'];px,py,obj=positions[oid]
         if oid not in triggered:continue
@@ -201,7 +223,7 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
                     new=oid+'-'+run['math']+'-'+old;payload=payload.replace('id="'+old+'"','id="'+new+'"').replace('#'+old+'"','#'+new+'"').replace('#'+old+')','#'+new+')')
                 mathroot=ET.fromstring(payload);mathroot.set('width',str(w));mathroot.set('height',str(h));g.append(mathroot);math_groups.append(g)
             else:
-                attrs={'x':str(run['x']-px),'y':str(run['y']-py),'font-size':str(run['size']),'font-weight':run['weight'],'font-style':run['style'],'font-family':run['family'],'fill':run['color']}
+                attrs={'x':str(run['x']-px),'y':str(run['y']-py),'font-size':str(run['size']),'font-weight':run['weight'],'font-style':run['style'],'font-family':run['family'],'fill':run['color'],'letter-spacing':run.get('spacing','normal')}
                 ET.SubElement(node,'{'+NS+'}tspan',attrs).text=run['text']
         if math_groups:
             parent=next(p for p in root.iter() if node in list(p));idx=list(parent).index(node)
@@ -216,6 +238,7 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
     check=page.evaluate(geometry_js)
     shifts=[]
     for c in check:
+        if c['object_id'] not in triggered:continue
         x,y,w,h=c['frame'];delta=max(0,y-c.get('y',y))
         if delta and delta<=positions[c['object_id']][2].get('font_size',24)*.25 and c.get('y',y)+c.get('height',0)+delta<=y+h+1:
             node=nodes[c['object_id']]
@@ -228,14 +251,19 @@ def repair_svg(svg_path,spec,out_dir,*,issues=None,page=None):
             shifts.append({'object_id':c['object_id'],'baseline_shift_px':delta})
     if shifts:
         target.write_text(ET.tostring(root,encoding='unicode'));page.reload();page.evaluate('document.fonts.ready');page.evaluate("frames => Object.entries(frames).forEach(([id,frame])=>[...document.querySelectorAll('text')].find(n=>n.id===id).setAttribute('data-frame',JSON.stringify(frame)))",frames);check=page.evaluate(geometry_js)
+    container_checks=[]
+    if mode=='reference-guided':
+        from .reference_layout import check_containers
+        container_checks=check_containers(root,check,issues,positions)
+        target.write_text(ET.tostring(root,encoding='unicode'))
     subprocess.run(['rsvg-convert','--background-color','white','--output',str(out/'poster.png'),str(target)],check=True,capture_output=True)
-    result={'svg':str(target),'source_svg':str(source),'before_geometry_checks':before,'baseline_adjustments':shifts,'triggered_object_ids':sorted(triggered),'total_text_objects':len(positions),'emphasized_objects':[v['object_id'] for v in reports if v['emphasized']],'text_objects':reports,'svg_width_blockers':[c for c in check if c['horizontal']],'svg_height_blockers':[c for c in check if c['vertical']],'geometry_checks':check,'formulas_compiled':len(formulae),'limitations':['Preserves spec font size and geometry; cannot infer exact reference line breaks or missing emphasis without an issue map.','SVG font portability still depends on target installed fonts; formula paths do not.','Text overflow is reported, never hidden by shrinking fonts or clipping.']}
+    result={'mode':mode,'reference_line_findings':reference_line_findings,'spacing_adjustments':spacing_adjustments,'container_checks':container_checks,'container_blockers':[c for c in container_checks if c['status'].startswith('blocked') or c['text_collision_ids']],'svg':str(target),'source_svg':str(source),'before_geometry_checks':before,'baseline_adjustments':shifts,'triggered_object_ids':sorted(triggered),'total_text_objects':len(positions),'emphasized_objects':[v['object_id'] for v in reports if v['emphasized']],'text_objects':reports,'svg_width_blockers':[c for c in check if c['horizontal']],'svg_height_blockers':[c for c in check if c['vertical']],'geometry_checks':check,'formulas_compiled':len(formulae),'limitations':['Preserves spec font size and geometry; cannot infer exact reference line breaks or missing emphasis without an issue map.','SVG font portability still depends on target installed fonts; formula paths do not.','Text overflow is reported, never hidden by shrinking fonts or clipping.']}
     (out/'text-repair-report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));return result
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('svg');p.add_argument('--spec');p.add_argument('--issues');p.add_argument('--out',required=True);a=p.parse_args()
-    result=repair_svg(a.svg,a.spec or Path(a.svg).with_name('poster_spec.json'),a.out,issues=json.loads(Path(a.issues).read_text()) if a.issues else None)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('svg');p.add_argument('--spec');p.add_argument('--issues');p.add_argument('--out',required=True);p.add_argument('--mode',choices=['reference-guided','legacy'],default='reference-guided');a=p.parse_args()
+    result=repair_svg(a.svg,a.spec or Path(a.svg).with_name('poster_spec.json'),a.out,issues=json.loads(Path(a.issues).read_text()) if a.issues else None,mode=a.mode)
     print(json.dumps({'svg':result['svg'],'horizontal_blockers':len(result['svg_width_blockers']),'vertical_blockers':len(result['svg_height_blockers']),'formulas_compiled':result['formulas_compiled']}))
 
 if __name__=='__main__':main()

@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 FILE_TOOLS = {
     "assets": ("assets", "Extract PDF text, page previews and inspected crops"),
-    "editable": ("editable", "Build draft editable HTML from a poster spec"),
+    "editable": ("editable", "Build native SVG and HTML; replay approved typography repair"),
     "render": ("render", "Render local HTML to PNG/PDF and inspect geometry"),
 }
 

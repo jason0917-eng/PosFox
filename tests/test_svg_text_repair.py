@@ -140,3 +140,154 @@ def test_typeset_formula_use_references_render_in_inline_html(tmp_path):
             refs=page.evaluate("() => [...document.querySelectorAll('g[data-latex] use')].map(n=>({ref:n.href.baseVal,exists:!!document.getElementById(n.href.baseVal.slice(1))}))")
             assert refs and all(r['ref'].startswith('#') and r['exists'] for r in refs),refs
         finally:browser.close()
+
+
+def test_reference_lines_are_never_rewrapped_when_too_wide(tmp_path):
+    from posfoxgen.svg_text_repair import repair_svg
+    svg,spec=fixture(tmp_path)
+    text=spec['panels'][0]['objects'][0]['text']
+    result=repair_svg(svg,spec,tmp_path/'strict',issues={'body':{'lines':[text]}})
+    assert result['text_objects'][0]['line_count']==1
+    assert result['svg_width_blockers'], 'Report the mismatch instead of inventing more lines'
+
+
+def test_reference_mode_requires_evidence_and_leaves_other_overflow_untouched(tmp_path):
+    import hashlib
+    from posfoxgen.svg_text_repair import repair_svg
+    svg,spec=fixture(tmp_path)
+    with pytest.raises(ValueError,match='reference evidence'):
+        repair_svg(svg,spec,tmp_path/'invalid',issues={'body':{'lines':[spec['panels'][0]['objects'][0]['text']]}},mode='reference-guided')
+    proof=tmp_path/'reference.png'
+    from PIL import Image
+    Image.new('RGB',(20,20),'white').save(proof)
+    obj=spec['panels'][0]['objects'][0];other={**obj,'id':'other','y':160,'text':'An overflowing unconfirmed object must stay unchanged'}
+    spec['panels'][0]['objects'].append(other)
+    tree=ET.parse(svg);root=tree.getroot();g=root.find('.//{*}g');node=ET.SubElement(g,'{http://www.w3.org/2000/svg}text',{'id':'other','x':'10','y':'180','font-size':'20'});node.text=other['text'];before=ET.tostring(node);tree.write(svg,encoding='unicode')
+    issue={'lines':['A long scientific paragraph','needs several visible lines','to fit its fixed frame.'],'reference':{'path':str(proof),'sha256':hashlib.sha256(proof.read_bytes()).hexdigest()},'reason':'paired source confirms wrong line breaks'}
+    result=repair_svg(svg,spec,tmp_path/'scoped',issues={'body':issue},mode='reference-guided')
+    assert result['triggered_object_ids']==['body']
+    after=next(n for n in ET.parse(result['svg']).iter() if n.get('id')=='other')
+    assert ET.tostring(after)==before
+
+
+def test_reference_containers_are_audited_but_never_resized():
+    from posfoxgen.reference_layout import check_containers
+    root=ET.fromstring('<svg><g><rect id="box" x="0" y="0" width="100" height="20"/></g></svg>')
+    checks=[{'object_id':'body','x':5,'y':5,'width':80,'height':30}]
+    issues={'body':{'container':{'id':'box','reference_frame':[0,0,100,40]}}}
+    before=ET.tostring(root)
+    result=check_containers(root,checks,issues,{'body':(0,0,{})})
+    assert result[0]['status']=='blocked_container_overflow'
+    assert ET.tostring(root)==before
+
+
+def test_native_title_at_page_top_uses_ink_bounds_not_em_box(tmp_path):
+    from posfoxgen.editable import export_svg
+    from posfoxgen.render import render_poster
+    svg,spec=fixture(tmp_path)
+    obj=spec['panels'][0]['objects'][0];obj.update(y=0,text='A title\nSecond title',font_size=40,line_height=1.02,height=85,width=220)
+    spec['typography_repair']={'format':'posfoxgen-svg-text-repair-v1','issues':{'body':{'lines':['A title','Second title']}}}
+    export_svg(spec,{'assets':[]},tmp_path/'title')
+    result=render_poster(tmp_path/'title/poster.html',tmp_path/'render')
+    assert result['layout_pass'],result['blockers']
+
+
+def test_reference_spacing_compacts_text_without_touching_frames_or_font_size(tmp_path):
+    import hashlib
+    from PIL import Image
+    from posfoxgen.svg_text_repair import repair_svg
+    from posfoxgen.editable import export_svg
+    svg,spec=fixture(tmp_path);obj=spec['panels'][0]['objects'][0]
+    obj.update(text='A scientific title\nAnother title',width=150,height=38,font_size=20,line_height=1.5)
+    proof=tmp_path/'reference.png';Image.new('RGB',(200,100),'white').save(proof)
+    svg=export_svg(spec,{'assets':[]},tmp_path/'base')
+    issue={'lines':['A scientific title','Another title'],'reason':'reference confirms two lines and fixed title frame','reference':{'path':str(proof),'sha256':hashlib.sha256(proof.read_bytes()).hexdigest()},'panel_frame':[0,0,240,200]}
+    result=repair_svg(svg,spec,tmp_path/'compact',issues={'body':issue},mode='reference-guided')
+    assert not result['svg_width_blockers']
+    assert not result['svg_height_blockers']
+    assert result['spacing_adjustments']
+    node=next(n for n in ET.parse(result['svg']).iter() if n.get('id')=='body')
+    assert node.get('font-size')=='20'
+    assert result['text_objects'][0]['line_count']==2
+    assert obj['width']==150 and obj['height']==38 and obj['line_height']==1.5
+
+
+def test_reference_rejects_et_al_split_across_lines(tmp_path):
+    import hashlib
+    from PIL import Image
+    from posfoxgen.reference_layout import validate_reference
+    image=tmp_path/'source.png';Image.new('RGB',(20,20),'white').save(image)
+    issue={'reason':'reference citation','lines':['B. P. Abbott et','al. (LIGO)'],'reference':{'path':str(image),'sha256':hashlib.sha256(image.read_bytes()).hexdigest()}}
+    with pytest.raises(ValueError,match='protected phrase'):
+        validate_reference({'citation':issue})
+
+
+def test_et_al_returns_to_one_line_without_invading_doi(tmp_path):
+    import hashlib
+    from PIL import Image
+    from posfoxgen.editable import export_svg
+    from posfoxgen.svg_text_repair import repair_svg
+    svg,spec=fixture(tmp_path);obj=spec['panels'][0]['objects'][0]
+    obj.update(text='Abbott et al.',width=96,height=24,font_size=20,line_height=1.2)
+    spec['panels'][0]['objects'].append({**obj,'id':'doi','y':36,'width':210,'text':'DOI: 10.1103/example'})
+    svg=export_svg(spec,{'assets':[]},tmp_path/'initial')
+    proof=tmp_path/'reference.png';Image.new('RGB',(240,200),'white').save(proof)
+    issue={'reason':'severe protected-phrase break above DOI','lines':['Abbott et al.'],'reference':{'path':str(proof),'sha256':hashlib.sha256(proof.read_bytes()).hexdigest()},'panel_frame':[0,0,240,200]}
+    before=next(n for n in ET.parse(svg).iter() if n.get('id')=='doi');frozen=ET.tostring(before)
+    result=repair_svg(svg,spec,tmp_path/'final',issues={'body':issue},mode='reference-guided')
+    assert not result['svg_width_blockers'] and not result['svg_height_blockers']
+    assert not result['container_blockers']
+    assert result['reference_line_findings'][0]['severity']=='severe'
+    after=ET.parse(result['svg']);node=next(n for n in after.iter() if n.get('id')=='body')
+    assert ''.join(node.itertext())=='Abbott et al.'
+    assert len({t.get('y') for t in node})==1
+    assert ET.tostring(next(n for n in after.iter() if n.get('id')=='doi'))==frozen
+
+
+def test_inline_render_blocks_collision_between_fixed_text_frames(tmp_path):
+    import hashlib
+    from PIL import Image
+    from posfoxgen.editable import export_svg
+    from posfoxgen.render import render_poster
+    svg,spec=fixture(tmp_path);obj=spec['panels'][0]['objects'][0];obj.update(text='A title',height=25)
+    spec['panels'][0]['objects'].append({**obj,'id':'author','text':'An author'})
+    proof=tmp_path/'ref.png';Image.new('RGB',(240,200),'white').save(proof)
+    issue={'reason':'reference','lines':['A title'],'reference':{'path':str(proof),'sha256':hashlib.sha256(proof.read_bytes()).hexdigest()},'panel_frame':[0,0,240,200]}
+    spec['typography_repair']={'format':'posfoxgen-svg-text-repair-v1','mode':'reference-guided','issues':{'body':issue}}
+    export_svg(spec,{'assets':[]},tmp_path/'overlap')
+    report=render_poster(tmp_path/'overlap/poster.html',tmp_path/'render')
+    assert not report['layout_pass']
+    assert any(b['code']=='reference_text_collision' for b in report['blockers'])
+
+
+def test_reference_inspection_reads_relative_dy_lines_and_inline_runs():
+    from posfoxgen.reference_layout import inspect_reference_lines
+    root=ET.fromstring('<svg><text id="title" y="20"><tspan x="0" dy="0">First line</tspan><tspan x="0" dy="24"><tspan>Second </tspan><tspan>line</tspan></tspan></text></svg>')
+    result=inspect_reference_lines(root,{'title':{'lines':['First line','Second line']}})
+    assert result[0]['actual_lines']==['First line','Second line']
+    assert not result[0]['line_mismatch']
+
+
+def test_confirmed_reference_color_survives_measured_repair(tmp_path):
+    from posfoxgen.svg_text_repair import repair_svg
+    svg,spec=fixture(tmp_path)
+    result=repair_svg(svg,spec,tmp_path/'color',issues={'body':{'emphasis':[{'text':'scientific','font_weight':700,'color':'#e98a05'}]}})
+    node=next(n for n in ET.parse(result['svg']).iter() if n.get('id')=='body')
+    assert any(n.get('fill')=='rgb(233, 138, 5)' and 'scientific' in ''.join(n.itertext()) for n in node)
+
+
+def test_editable_cli_runs_native_export_and_reference_guided_contract(tmp_path):
+    import hashlib
+    from PIL import Image
+    from posfoxgen.editable import main
+    svg,spec=fixture(tmp_path);obj=spec['panels'][0]['objects'][0]
+    obj['text']='Scientific title'
+    reference=tmp_path/'reference.png';Image.new('RGB',(240,200),'white').save(reference)
+    spec['typography_repair']={'format':'posfoxgen-svg-text-repair-v1','issues':{'body':{'reason':'confirmed source line','lines':['Scientific title'],'reference':{'path':str(reference),'sha256':hashlib.sha256(reference.read_bytes()).hexdigest()},'panel_frame':[0,0,240,200]}}}
+    spec_path=tmp_path/'spec.json';spec_path.write_text(json.dumps(spec));asset_path=tmp_path/'assets.json';asset_path.write_text(json.dumps({'assets':[]}))
+    main([str(spec_path),'--assets',str(asset_path),'--out',str(tmp_path/'out')])
+    assert (tmp_path/'out/poster.svg').is_file()
+    assert (tmp_path/'out/poster.html').is_file()
+    report=json.loads((tmp_path/'out/text-repair-report.json').read_text())
+    assert report['mode']=='reference-guided'
+    assert 'mode' not in json.loads(spec_path.read_text())['typography_repair']
